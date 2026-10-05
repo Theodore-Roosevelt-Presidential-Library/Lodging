@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Lodging Availability Monitor | TRPL</title>
+<style>
+  :root{--green:#1B4633;--accent:#E7805D;--line:#D8D5CC;--muted:#5A5F61;--wash:#F6F4EE}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Frutiger","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:15px;color:#25282A;background:#fff}
+  main{max-width:1200px;margin:0 auto;padding:28px 20px 64px}
+  h1{font-size:26px;margin:0 0 4px;color:var(--green)}
+  h2{font-size:18px;margin:32px 0 10px;color:var(--green)}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+  .tile{border:1px solid var(--line);border-radius:2px;padding:14px;background:var(--wash)}
+  .tile b{display:block;font-size:26px;color:var(--green)}
+  .tile span{color:var(--muted);font-size:13px}
+  .bar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 12px}
+  select,input{font:inherit}
+  .scroll{overflow:auto;max-height:72vh;border:1px solid var(--line)}
+  table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+  th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{position:sticky;top:0;background:#fff;border-bottom:2px solid var(--green);font-size:13px;white-space:normal;vertical-align:bottom}
+  tr.we td:first-child{font-weight:700}
+  td.open{background:#E6EFE9}
+  td.full{background:#F7DDD3;color:#7A2E15}
+  td.none{color:#9A9C9A}
+  td small{color:var(--muted);margin-left:4px}
+  tr.month td{background:var(--green);color:#fff;font-weight:700;text-align:left}
+  .legend span{display:inline-block;padding:2px 8px;margin-right:8px;border:1px solid var(--line);font-size:13px}
+  .empty{padding:16px;border:1px solid var(--line);background:var(--wash)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Lodging availability monitor</h1>
+  <p class="sub" id="sub">Loading…</p>
+  <div class="tiles" id="tiles"></div>
+  <div class="bar">
+    <label>Jump to <select id="jump"></select></label>
+    <label><input type="checkbox" id="we"> Fridays and Saturdays only</label>
+    <span class="legend"><span style="background:#E6EFE9">Open</span><span style="background:#F7DDD3">Full or closed</span><span>— not checked yet</span></span>
+  </div>
+  <div class="scroll"><table id="grid"><thead></thead><tbody></tbody></table></div>
+  <h2>Recent changes</h2>
+  <div id="changes" class="empty">No changes logged yet.</div>
+</main>
+<script>
+(function () {
+  'use strict';
+  function parse(iso){var p=iso.split('-');return new Date(Date.UTC(+p[0],p[1]-1,+p[2]));}
+  function fmt(iso,o){return parse(iso).toLocaleDateString('en-US',Object.assign({timeZone:'UTC'},o));}
+  function el(tag,text,cls){var e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
+  function isWeekend(iso){var d=parse(iso).getUTCDay();return d===5||d===6;}
+
+  Promise.all([
+    fetch('data/availability.json',{cache:'no-cache'}).then(function(r){return r.json();}),
+    fetch('data/changes.csv',{cache:'no-cache'}).then(function(r){return r.ok?r.text():'';}).catch(function(){return '';})
+  ]).then(function(res){
+    var data=res[0], csv=res[1];
+    var live=data.properties.filter(function(p){return p.live;});
+    var nights=Object.keys(data.nights||{}).sort();
+    var names={}; data.properties.forEach(function(p){names[p.id]=p.name;});
+
+    document.getElementById('sub').textContent='Whether a one-night stay for two adults could be booked. Last refreshed '+
+      new Date(data.generated_at).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})+'.';
+
+    // tiles
+    var hotels=live.filter(function(p){return p.type==='hotel';});
+    var soldOut=0, complete=0;
+    nights.forEach(function(n){
+      var recs=hotels.map(function(p){return data.nights[n][p.id];});
+      if(recs.every(Boolean)){complete++; if(recs.every(function(r){return r.a!==1;})) soldOut++;}
+    });
+    var tiles=document.getElementById('tiles');
+    [[nights.length,'nights with data'],[live.length,'properties tracked live'],
+     [complete?soldOut:'—','nights with no tracked hotel room, of '+complete+' fully checked']].forEach(function(t){
+      var d=el('div',undefined,'tile'); d.appendChild(el('b',String(t[0]))); d.appendChild(el('span',t[1])); tiles.appendChild(d);
+    });
+
+    // grid
+    var thead=document.querySelector('#grid thead'), tbody=document.querySelector('#grid tbody');
+    var hr=el('tr'); hr.appendChild(el('th','Night'));
+    live.forEach(function(p){hr.appendChild(el('th',p.name));});
+    thead.appendChild(hr);
+    var jump=document.getElementById('jump'), weBox=document.getElementById('we');
+
+    function draw(){
+      tbody.textContent=''; jump.textContent=''; var month='';
+      if(!nights.length){var r=el('tr');var c=el('td','No nights collected yet. Run the collector to fill this grid.','none');c.colSpan=live.length+1;r.appendChild(c);tbody.appendChild(r);return;}
+      nights.forEach(function(n){
+        if(weBox.checked&&!isWeekend(n))return;
+        var m=n.slice(0,7);
+        if(m!==month){month=m;var mr=el('tr',undefined,'month');mr.id='m'+m;var mc=el('td',fmt(n,{month:'long',year:'numeric'}));mc.colSpan=live.length+1;mr.appendChild(mc);tbody.appendChild(mr);
+          var o=el('option',fmt(n,{month:'long',year:'numeric'}));o.value='m'+m;jump.appendChild(o);}
+        var tr=el('tr',undefined,isWeekend(n)?'we':'');
+        tr.appendChild(el('td',fmt(n,{weekday:'short',month:'short',day:'numeric'})));
+        live.forEach(function(p){
+          var rec=data.nights[n][p.id], td;
+          if(!rec) td=el('td','—','none');
+          else if(rec.a===1){td=el('td','Open','open'); if(rec.q&&rec.q<=3) td.appendChild(el('small',rec.q+' left')); td.title='checked '+rec.t;}
+          else {td=el('td','Full or closed','full'); td.title='checked '+rec.t;}
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+    jump.addEventListener('change',function(){var t=document.getElementById(jump.value);if(t)t.scrollIntoView({block:'start'});});
+    weBox.addEventListener('change',draw);
+    draw();
+
+    // changes
+    var rows=csv.trim().split('\n').slice(1).filter(Boolean).map(function(l){return l.split(',');});
+    if(rows.length){
+      var box=document.getElementById('changes'); box.className='scroll'; box.textContent='';
+      var t=el('table'), th=el('tr'); ['Checked','Night','Property','Change'].forEach(function(x){th.appendChild(el('th',x));});
+      var thd=el('thead'); thd.appendChild(th); t.appendChild(thd); var tb=el('tbody');
+      rows.slice(-60).reverse().forEach(function(r){
+        var tr=el('tr'); var what=r[3]==='opened'?'Opened up':'Sold out or closed';
+        [r[0],fmt(r[1],{weekday:'short',month:'short',day:'numeric',year:'numeric'}),names[r[2]]||r[2],what].forEach(function(x,i){var td=el('td',x);if(i)td.style.textAlign='left';tr.appendChild(td);});
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); box.appendChild(t);
+    }
+  }).catch(function(){document.getElementById('sub').textContent='Could not load data/availability.json.';});
+})();
+</script>
+</body>
+</html>
