@@ -1,6 +1,6 @@
 # Lodging Finder: plan and status
 
-Last updated October 5, 2026.
+Last updated October 6, 2026.
 
 ## Why build this
 
@@ -13,6 +13,10 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 - Version one shows live availability by date, not just a directory.
 - Availability only. Rates are not collected, stored or shown.
 - Add Google Hotels, Guesty and Apify sources now; keys go in `.env` locally and repository secrets on GitHub.
+- `LODGING_SOURCES` is `google_hotels,trmf,airbnb,vrbo`.
+- Oct 6: photos come from each property's own website (link-preview image), then Google Hotels; shown from those addresses, never copied.
+- Oct 6: the trolley is mentioned only for stays inside its season (June through September).
+- Oct 6: compact layout. One button per property, phone number as a text link, one-line rows for places to check directly.
 
 ## Status
 
@@ -21,13 +25,14 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 | Property list (58 properties, 52 public) | Done |
 | Widget | Done; tested in a headless browser at desktop and phone widths |
 | Monitor | Done |
-| Collector: Medora Foundation (`trmf`) | Done; endpoint confirmed with a handful of live requests; switched off |
-| Collector: Google Hotels (`google_hotels`) | Built from SearchApi's documentation; needs a key and a `--check` |
-| Collector: Airbnb and Vrbo (`airbnb`, `vrbo`) | Built from the Apify actors' documentation; needs a token and a `--check` |
+| Collector: Medora Foundation (`trmf`) | Tested live Oct 5 (three nights) |
+| Collector: Google Hotels (`google_hotels`) | Tested live Oct 5; 18 of 18 hotels matched |
+| Collector: Airbnb and Vrbo (`airbnb`, `vrbo`) | Tested live Oct 5; full 330-night calendars |
 | Vacation Medora cabins | Read from their Airbnb calendars (see below); the `guesty` collector is kept but unused |
-| Offline tests | 24 pass; they use canned responses shaped like each service's documentation |
-| Daily workflow | Written; not yet run on GitHub |
-| Pages site | Not yet enabled |
+| Photos (`collector/photos.py`) | Done; see "Photos" below |
+| Offline tests | 40 pass; they use canned responses shaped like each service's documentation |
+| Daily workflow | Written; `.github/workflows/collect.yml` is not in the repository yet, so nothing refreshes on its own |
+| Pages site | Live at lodging.labs.trlibrary.com |
 
 ## To validate once keys are in `.env`
 
@@ -37,7 +42,19 @@ Run `python collector/collect.py --check` and look for:
 2. **airbnb**: "parsed calendars: 1" with about 30 days.
 3. **vrbo**: a few items with titles from the Medora area. The actor takes the map area as `bbox:south,west,north,east`; if it returns nothing, that input format is the first thing to check.
 
-## Open decision: the Medora Foundation source
+## Photos
+
+About 8 of 44 properties publish a usable link-preview image on their own site. Most chain-hotel sites refuse automated requests, several small properties publish none, and a few publish only a logo or one image shared across every page (medora.com gives Hotel 1883 the Rough Riders Hotel picture, so that one is ignored for Hotel 1883 and set by hand for Rough Riders).
+
+Google Hotels fills most of the gap for hotels whenever `google_hotels` runs: its results include a photo for every hotel, and the collector notes the first one. With it, 27 of 44 properties have a photo (Oct 6), including every hotel with live availability. Those can be guest-contributed, so they carry more rights risk than a property's own preview image; `python collector/photos.py --no-google` leaves them out.
+
+Best long-term fix for the Medora properties: Library-shot or partner-supplied photos set with `"photo"` in `data/properties.json`.
+
+## SearchApi plan
+
+The free tier is 100 searches, once. Daily use is about 140 searches (about 4,200 a month), so running `google_hotels` daily needs the Developer plan, $40 a month for 10,000 searches, the smallest paid tier. Without it, leave `google_hotels` out of `LODGING_SOURCES`: the 16 Dickinson hotels, AmericInn Medora and Trapper's Inn then appear under "check directly," and hotel photos from Google are not refreshed.
+
+## The Medora Foundation source
 
 The Foundation's booking engine (bookings.medora.com, run by P3 Hotels) exposes the same JSON price lookup its own pages use:
 
@@ -45,13 +62,9 @@ The Foundation's booking engine (bookings.medora.com, run by P3 Hotels) exposes 
 
 It returns availability and how many of the first-listed room type remain (along with rates, which the collector discards). No key is needed.
 
-The site's `robots.txt` disallows automated access to everything except `/search-rates`, `/offer` and `/offers`. A scheduled collector would go against that file. The source therefore ships switched off. Options:
+The site's `robots.txt` disallows automated access to everything except `/search-rates`, `/offer` and `/offers`. A scheduled collector goes against that file. `trmf` is included in `LODGING_SOURCES` by the CCMO's decision. Still worth doing: ask the Foundation to approve the daily check (or provide a feed). With their agreement the robots file is moot, and they gain a booking channel on trlibrary.com. Until then this carries relationship risk with the Library's closest lodging partner.
 
-1. **Ask the Foundation** to approve the daily check (or provide a feed). With their agreement the robots file is moot, and they gain a booking channel on trlibrary.com.
-2. Turn it on without asking. Technically works; carries relationship risk with the Library's closest lodging partner.
-3. Leave it off; the widget still lists the Foundation's properties with dated links to their booking site.
-
-To turn it on: add `trmf` to `LODGING_SOURCES`, then run the workflow once with "full" ticked.
+The first full run makes about 1,650 requests, one a second.
 
 ## Property list choices to review
 

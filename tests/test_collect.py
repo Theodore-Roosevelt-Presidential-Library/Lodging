@@ -39,6 +39,8 @@ class Sandbox(unittest.TestCase):
         tmp = Path(self.tmp.name)
         (tmp / "properties.json").write_text(json.dumps({"properties": self.PROPS}))
         self._saved = (collect.PROPERTIES, collect.OUT, collect.CHANGES, collect.GUESTY_TOKEN_CACHE, collect.http_json)
+        self._hints = collect.PHOTO_HINTS
+        collect.PHOTO_HINTS = tmp / "photo_hints.json"
         collect.PROPERTIES = tmp / "properties.json"
         collect.OUT = tmp / "out.json"
         collect.CHANGES = tmp / "changes.csv"
@@ -48,6 +50,7 @@ class Sandbox(unittest.TestCase):
 
     def tearDown(self):
         (collect.PROPERTIES, collect.OUT, collect.CHANGES, collect.GUESTY_TOKEN_CACHE, collect.http_json) = self._saved
+        collect.PHOTO_HINTS = self._hints
         self.tmp.cleanup()
 
     def http(self, method, url, headers=None, json_body=None, form=None):
@@ -180,6 +183,34 @@ class GoogleHotels(Sandbox):
         summary = collect.run(args(sources="google_hotels", limit=1), today=TODAY, sleep=lambda s: None, env={})
         self.assertEqual(self.calls, [])
         self.assertTrue(summary["sources"]["google_hotels"]["note"].startswith("skipped"))
+
+    def test_photo_hints_come_from_matched_results_only(self):
+        page = {"properties": [
+            {"name": "Hampton Inn & Suites Dickinson", "price_per_night": {"extracted_price": 201},
+             "images": [{"thumbnail": "https://img.example/hampton-1", "original": "https://img.example/hampton-big"},
+                        {"thumbnail": "https://img.example/hampton-2"}]},
+            {"name": "Somewhere Else Inn", "images": [{"thumbnail": "https://img.example/other"}]},
+            {"name": "AmericInn by Wyndham Dickinson", "images": []},
+        ]}
+        self.respond = lambda *a, **k: page
+        collect.run(args(sources="google_hotels", limit=1), today=TODAY, sleep=lambda s: None, env={"SEARCHAPI_KEY": "KEY"})
+        hints = json.loads(collect.PHOTO_HINTS.read_text())["hints"]
+        self.assertEqual(list(hints), ["hampton"])
+        self.assertEqual(hints["hampton"]["src"], "https://img.example/hampton-1")
+
+    def test_same_brand_in_two_towns_keeps_its_own_photo(self):
+        props = self.PROPS + [{"id": "americinn-medora", "name": "AmericInn Medora", "public": True,
+                               "live": {"source": "google_hotels", "query": "medora", "match": "americinn"}}]
+        collect.PROPERTIES.write_text(json.dumps({"properties": props}))
+        pages = {"Medora": {"properties": [{"name": "AmericInn by Wyndham Medora", "images": [{"thumbnail": "https://lh3.googleusercontent.com/a/MEDORA=s287-w287-h192-n-k-no-v1"}]}]},
+                 "Dickinson": {"properties": [{"name": "AmericInn by Wyndham Dickinson", "images": [{"thumbnail": "https://lh3.googleusercontent.com/a/DICKINSON=s287-w287-h192-n-k-no-v1"}]}]}}
+        self.respond = lambda method, url, *a, **k: pages["Medora" if "Medora" in url else "Dickinson"]
+        collect.run(args(sources="google_hotels", limit=1), today=TODAY, sleep=lambda s: None, env={"SEARCHAPI_KEY": "KEY"})
+        hints = json.loads(collect.PHOTO_HINTS.read_text())["hints"]
+        self.assertEqual(hints["americinn-medora"]["src"], "https://lh3.googleusercontent.com/a/MEDORA=w640-h360-n-k-no")
+        self.assertEqual(hints["americinn"]["src"], "https://lh3.googleusercontent.com/a/DICKINSON=w640-h360-n-k-no")
+        self.assertNotIn("201", collect.PHOTO_HINTS.read_text())
+        self.assertNotIn("trolley_months", collect.PHOTO_HINTS.read_text())
 
     def test_name_matching_does_not_cross_wires(self):
         results = [{"name": "Hampton Inn & Suites Dickinson", "price_per_night": {"extracted_price": 1}}]
@@ -354,7 +385,25 @@ class EnvFile(unittest.TestCase):
                 os.environ.pop("LODGING_TEST_B", None)
 
 
+class TrolleySeason(Sandbox):
+    PROPS = [{"id": "h", "name": "H", "public": True}]
+
+    def test_trolley_months_are_passed_to_the_widget(self):
+        collect.PROPERTIES.write_text(json.dumps({"trolley_months": [6, 7, 8, 9], "properties": self.PROPS}))
+        collect.run(args(sources=""), today=TODAY, sleep=lambda s: None, env={})
+        self.assertEqual(self.out()["trolley_months"], [6, 7, 8, 9])
+
+    def test_no_months_means_no_trolley_mention(self):
+        collect.run(args(sources=""), today=TODAY, sleep=lambda s: None, env={})
+        self.assertEqual(self.out()["trolley_months"], [])
+
+
 class RealPropertyFile(unittest.TestCase):
+    def test_trolley_runs_june_through_september(self):
+        catalog = json.loads((ROOT / "data" / "properties.json").read_text())
+        self.assertEqual(catalog["trolley_months"], [6, 7, 8, 9])
+
+
     def test_live_blocks_are_well_formed(self):
         props = json.loads((ROOT / "data" / "properties.json").read_text())["properties"]
         ids = [p["id"] for p in props]

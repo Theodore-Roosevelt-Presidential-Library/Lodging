@@ -1,9 +1,12 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip).",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text.",
+  "trolley_months": [6, 7, 8, 9],
+  "trolley_note": "Months when the free Medora trolley runs (trlibrary.com/visit/trolley: June through September). The widget mentions the trolley only for stays that fall entirely inside these months.",
   "properties": [
     {
       "id": "hotel-1883",
+      "photo_match": "hotel 1883",
       "name": "Hotel 1883",
       "type": "hotel",
       "town": "Medora",
@@ -13,7 +16,7 @@
       "season": "Open year-round",
       "units": 100,
       "unit_label": "rooms",
-      "url": "https://medora.com/stay/",
+      "url": "https://medora.com/hotel1883/",
       "dated_url": "https://bookings.medora.com/rates-room1?city=11&hotel=62704&arrival={in}&departure={out}&rooms=1&adults%5B1%5D=2&children%5B1%5D=0",
       "phone": "1-800-633-6721",
       "live": {
@@ -27,6 +30,7 @@
     },
     {
       "id": "rough-riders-hotel",
+      "photo": "https://medora.com/wp-content/uploads/2022/11/Rough-Riders-Hotel-1.jpg",
       "name": "Rough Riders Hotel and historic inns",
       "type": "hotel",
       "town": "Medora",
@@ -36,7 +40,7 @@
       "season": "Hotel open year-round; the inns open May to September",
       "units": 83,
       "unit_label": "rooms",
-      "url": "https://medora.com/stay/",
+      "url": "https://medora.com/roughridershotel/",
       "dated_url": "https://bookings.medora.com/rates-room1?city=11&hotel=62700&arrival={in}&departure={out}&rooms=1&adults%5B1%5D=2&children%5B1%5D=0",
       "phone": "1-800-633-6721",
       "live": {
@@ -59,7 +63,7 @@
       "season": "Open May to early October",
       "units": 114,
       "unit_label": "rooms",
-      "url": "https://medora.com/stay/",
+      "url": "https://medora.com/badlandsmotel/",
       "dated_url": "https://bookings.medora.com/rates-room1?city=11&hotel=62701&arrival={in}&departure={out}&rooms=1&adults%5B1%5D=2&children%5B1%5D=0",
       "phone": "1-800-633-6721",
       "live": {
@@ -82,7 +86,7 @@
       "season": "Open late May to mid-September",
       "units": 163,
       "unit_label": "rooms",
-      "url": "https://medora.com/stay/",
+      "url": "https://medora.com/elkhornquarters/",
       "dated_url": "https://bookings.medora.com/rates-room1?city=11&hotel=62702&arrival={in}&departure={out}&rooms=1&adults%5B1%5D=2&children%5B1%5D=0",
       "phone": "1-800-633-6721",
       "live": {
@@ -105,7 +109,7 @@
       "season": "Open May to early October",
       "units": 226,
       "unit_label": "sites",
-      "url": "https://medora.com/stay/",
+      "url": "https://medora.com/medoracampground/",
       "dated_url": "https://bookings.medora.com/rates-room1?city=11&hotel=62703&arrival={in}&departure={out}&rooms=1&adults%5B1%5D=2&children%5B1%5D=0",
       "phone": "1-800-633-6721",
       "live": {
@@ -155,6 +159,7 @@
     },
     {
       "id": "dakota-place-lodge",
+      "photo_match": "dakota place lodge",
       "name": "Dakota Place Lodge and Maltese Ranch Cabin",
       "type": "cabin",
       "town": "Medora",
@@ -185,6 +190,7 @@
     },
     {
       "id": "boots-cabins",
+      "photo": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
       "name": "Boots cabins and Boots House",
       "type": "cabin",
       "town": "Medora",
@@ -252,6 +258,7 @@
     },
     {
       "id": "spirit-of-the-badlands",
+      "photo_match": "spirit of the badlands",
       "name": "Spirit of the Badlands",
       "type": "cabin",
       "town": "Southwest of Medora",

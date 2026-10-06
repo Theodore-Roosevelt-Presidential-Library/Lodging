@@ -42,6 +42,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PROPERTIES = ROOT / "data" / "properties.json"
 OUT = ROOT / "docs" / "data" / "availability.json"
+PHOTO_HINTS = ROOT / "docs" / "data" / "photo_hints.json"
 CHANGES = ROOT / "docs" / "data" / "changes.csv"
 ENV_FILE = ROOT / ".env"
 GUESTY_TOKEN_CACHE = ROOT / ".guesty_token.json"
@@ -249,6 +250,32 @@ def collect_trmf(run: Run, props: list[dict]) -> None:
 
 # --------------------------------------------------------------------------- google hotels (SearchApi)
 
+def photo_size(src: str) -> str:
+    """Google serves its hotel photos at whatever size the address asks for; ask for a card-sized one."""
+    if "googleusercontent.com/" in src:
+        return re.sub(r"=[a-z0-9-]+$", "", src) + "=w640-h360-n-k-no"
+    return src
+
+
+def note_photos(run: Run, results: list[dict], query: str) -> None:
+    """Remember the first Google Hotels image for each property that wants one (see collector/photos.py).
+
+    A tracked hotel is matched only in its own town's results, so two hotels of one brand cannot swap photos.
+    """
+    names = [(norm(r.get("name", "")), r) for r in results]
+    for pid, (want, where) in getattr(run, "photo_targets", {}).items():
+        if where not in (None, query):
+            continue
+        hit = next((r for name, r in names if want and want in name), None)
+        first = ((hit or {}).get("images") or [None])[0]
+        src = (first.get("thumbnail") or first.get("original")) if isinstance(first, dict) else first
+        if not (isinstance(src, str) and src.startswith("https://")):
+            continue
+        src = photo_size(src)
+        if (run.photo_hints.get(pid) or {}).get("src") != src:
+            run.photo_hints[pid] = {"src": src, "name": hit.get("name", ""), "seen": run.stamp}
+
+
 def google_search(key: str, query: str, night: str, max_pages: int, run: Run) -> list[dict]:
     checkout = (dt.date.fromisoformat(night) + dt.timedelta(days=1)).isoformat()
     found, token = [], None
@@ -296,7 +323,9 @@ def collect_google_hotels(run: Run, props: list[dict]) -> None:
         for qkey, qprops in by_query.items():
             text, pages = GOOGLE_QUERIES[qkey]
             try:
-                for pid, rec in match_google(google_search(key, text, night, pages, run), qprops).items():
+                results = google_search(key, text, night, pages, run)
+                note_photos(run, results, qkey)
+                for pid, rec in match_google(results, qprops).items():
                     run.put(night, pid, rec)
                 streak = 0
             except HttpError as exc:
@@ -441,9 +470,10 @@ def collect_guesty(run: Run, props: list[dict]) -> None:
 
 def apify_run(actor: str, actor_input: dict, token: str, run: Run, source: str) -> list[dict]:
     """Start an actor, wait for it to finish, return its dataset items."""
+    # waitForFinish must stay below TIMEOUT_SECONDS or every poll would time out.
     auth = {"Authorization": f"Bearer {token}"}
     run.stat(source)["requests"] += 1
-    started = (http_json("POST", f"{APIFY_API}/acts/{actor}/runs?waitForFinish=60", headers=auth,
+    started = (http_json("POST", f"{APIFY_API}/acts/{actor}/runs?waitForFinish=20", headers=auth,
                          json_body=actor_input) or {}).get("data") or {}
     run_id, status = started.get("id"), started.get("status")
     if not run_id:
@@ -452,7 +482,7 @@ def apify_run(actor: str, actor_input: dict, token: str, run: Run, source: str) 
     while status not in ("SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"):
         if time.time() > deadline:
             raise HttpError(f"Apify run did not finish within {APIFY_MAX_WAIT_SECONDS} seconds")
-        info = (http_json("GET", f"{APIFY_API}/actor-runs/{run_id}?waitForFinish=60", headers=auth) or {}).get("data") or {}
+        info = (http_json("GET", f"{APIFY_API}/actor-runs/{run_id}?waitForFinish=20", headers=auth) or {}).get("data") or {}
         status = info.get("status")
         started = info or started
         run.sleep(1)
@@ -627,7 +657,8 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
     enabled = [s for s in SOURCE_ORDER + sorted(set(sources) - set(SOURCE_ORDER))
                if s in {x.strip() for x in (args.sources or "").split(",") if x.strip()} and s in sources]
 
-    props = load_json(PROPERTIES, {"properties": []})["properties"]
+    catalog = load_json(PROPERTIES, {"properties": []})
+    props = catalog["properties"]
     previous = load_json(OUT, {})
     nights = {n: recs for n, recs in (previous.get("nights") or {}).items() if n >= stamp}
     checked = {s: {n: t for n, t in seen.items() if n >= stamp}
@@ -639,6 +670,17 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
             del recs[pid]
 
     state = Run(today, args, nights, checked, sleep=sleep, env=env)
+    # Google Hotels results carry a photo; note one for each tracked hotel and for any property that asks
+    # for it with "photo_match". photos.py uses these only when a property's own site offers no image.
+    state.photo_targets = {}
+    for p in props:
+        live = p.get("live") or {}
+        tracked = live.get("source") == "google_hotels"
+        if p.get("public", True) and p.get("photo") is None and (p.get("photo_match") or tracked):
+            state.photo_targets[p["id"]] = (norm(p.get("photo_match") or live.get("match") or ""),
+                                            live.get("query") if tracked else None)
+    state.photo_hints = dict(load_json(PHOTO_HINTS, {}).get("hints") or {})
+    hints_before = json.dumps(state.photo_hints, sort_keys=True)
     for source in enabled:
         sprops = [p for p in props if (p.get("live") or {}).get("source") == source]
         if not sprops:
@@ -674,6 +716,7 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
         "basis": "Whether a stay for two adults could be booked when checked. Rates are not collected.",
         "sources_enabled": enabled,
         "sources": {s: {"ok": v.get("ok", False), "note": v.get("note", "")} for s, v in state.stats.items()},
+        "trolley_months": catalog.get("trolley_months", []),
         "properties": [p for p in props if p.get("public", True)],
         "nights": {n: nights[n] for n in sorted(nights) if nights[n]},
         "checked": {s: dict(sorted(v.items())) for s, v in checked.items() if v},
@@ -681,11 +724,21 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     append_changes(state.changes)
+    hints = {pid: h for pid, h in state.photo_hints.items() if pid in state.photo_targets}
+    if json.dumps(hints, sort_keys=True) != hints_before:
+        PHOTO_HINTS.write_text(json.dumps({
+            "note": "First Google Hotels image for each tracked hotel. Used by collector/photos.py as a fallback.",
+            "hints": dict(sorted(hints.items())),
+        }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return summary
 
 
 def main(argv=None) -> int:
     load_env()
+    try:  # show each source's result as it finishes, even when output is piped to a log
+        sys.stdout.reconfigure(line_buffering=True)
+    except AttributeError:
+        pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--full", action="store_true", help="re-check every night in each source's horizon")
     ap.add_argument("--dry-run", action="store_true", help="plan only; no network and no writes")
