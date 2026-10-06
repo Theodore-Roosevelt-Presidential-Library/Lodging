@@ -32,6 +32,8 @@
   tr.month td{background:var(--green);color:#fff;font-weight:700;text-align:left}
   .legend span{display:inline-block;padding:2px 8px;margin-right:8px;border:1px solid var(--line);font-size:13px}
   .empty{padding:16px;border:1px solid var(--line);background:var(--wash)}
+  .src span{display:inline-block;margin:0 8px 8px 0;padding:2px 8px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .src span.bad{border-color:#B4492A;color:#7A2E15;background:#F7DDD3}
 </style>
 </head>
 <body>
@@ -39,6 +41,7 @@
   <h1>Lodging availability monitor</h1>
   <p class="sub" id="sub">Loading…</p>
   <div class="tiles" id="tiles"></div>
+  <p class="src" id="sources"></p>
   <div class="bar">
     <label>Jump to <select id="jump"></select></label>
     <label><input type="checkbox" id="we"> Fridays and Saturdays only</label>
@@ -61,7 +64,10 @@
     fetch('data/changes.csv',{cache:'no-cache'}).then(function(r){return r.ok?r.text():'';}).catch(function(){return '';})
   ]).then(function(res){
     var data=res[0], csv=res[1];
-    var live=data.properties.filter(function(p){return p.live;});
+    var allLive=data.properties.filter(function(p){return p.live;});
+    // Dickinson hotels come from one source and would add a column each, so they are rolled into one count.
+    var dick=allLive.filter(function(p){return p.live.source==='google_hotels'&&p.area==='dickinson';});
+    var live=allLive.filter(function(p){return dick.indexOf(p)<0;});
     var nights=Object.keys(data.nights||{}).sort();
     var names={}; data.properties.forEach(function(p){names[p.id]=p.name;});
 
@@ -69,15 +75,15 @@
       new Date(data.generated_at).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})+'.';
 
     // tiles
-    var hotels=live.filter(function(p){return p.type==='hotel';});
+    var hotels=live.filter(function(p){return p.type==='hotel'&&p.live.source==='trmf';});
     var soldOut=0, complete=0;
     nights.forEach(function(n){
       var recs=hotels.map(function(p){return data.nights[n][p.id];});
       if(recs.every(Boolean)){complete++; if(recs.every(function(r){return r.a!==1;})) soldOut++;}
     });
     var tiles=document.getElementById('tiles');
-    [[nights.length,'nights with data'],[live.length,'properties tracked live'],
-     [complete?soldOut:'—','nights with no tracked hotel room, of '+complete+' fully checked']].forEach(function(t){
+    [[nights.length,'nights with data'],[allLive.length,'properties tracked live'],
+     [complete?soldOut:'—','nights with no Medora Foundation hotel room, of '+complete+' fully checked']].forEach(function(t){
       var d=el('div',undefined,'tile'); d.appendChild(el('b',String(t[0]))); d.appendChild(el('span',t[1])); tiles.appendChild(d);
     });
 
@@ -85,26 +91,36 @@
     var thead=document.querySelector('#grid thead'), tbody=document.querySelector('#grid tbody');
     var hr=el('tr'); hr.appendChild(el('th','Night'));
     live.forEach(function(p){hr.appendChild(el('th',p.name));});
+    if(dick.length) hr.appendChild(el('th','Dickinson hotels showing rooms'));
     thead.appendChild(hr);
+    var span=live.length+1+(dick.length?1:0);
+    var srcBox=document.getElementById('sources');
+    Object.keys(data.sources||{}).forEach(function(s){var v=data.sources[s];
+      var skipped=String(v.note||'').indexOf('skipped')===0;
+      srcBox.appendChild(el('span',s+': '+(v.ok?'ok':(skipped?'not set up':'problem'))+(v.note&&!skipped?' ('+v.note+')':''),(v.ok||skipped)?'':'bad'));});
     var jump=document.getElementById('jump'), weBox=document.getElementById('we');
 
     function draw(){
       tbody.textContent=''; jump.textContent=''; var month='';
-      if(!nights.length){var r=el('tr');var c=el('td','No nights collected yet. Run the collector to fill this grid.','none');c.colSpan=live.length+1;r.appendChild(c);tbody.appendChild(r);return;}
+      if(!nights.length){var r=el('tr');var c=el('td','No nights collected yet. Run the collector to fill this grid.','none');c.colSpan=span;r.appendChild(c);tbody.appendChild(r);return;}
       nights.forEach(function(n){
         if(weBox.checked&&!isWeekend(n))return;
         var m=n.slice(0,7);
-        if(m!==month){month=m;var mr=el('tr',undefined,'month');mr.id='m'+m;var mc=el('td',fmt(n,{month:'long',year:'numeric'}));mc.colSpan=live.length+1;mr.appendChild(mc);tbody.appendChild(mr);
+        if(m!==month){month=m;var mr=el('tr',undefined,'month');mr.id='m'+m;var mc=el('td',fmt(n,{month:'long',year:'numeric'}));mc.colSpan=span;mr.appendChild(mc);tbody.appendChild(mr);
           var o=el('option',fmt(n,{month:'long',year:'numeric'}));o.value='m'+m;jump.appendChild(o);}
         var tr=el('tr',undefined,isWeekend(n)?'we':'');
         tr.appendChild(el('td',fmt(n,{weekday:'short',month:'short',day:'numeric'})));
         live.forEach(function(p){
           var rec=data.nights[n][p.id], td;
           if(!rec) td=el('td','—','none');
-          else if(rec.a===1){td=el('td','Open','open'); if(rec.q&&rec.q<=3) td.appendChild(el('small',rec.q+' left')); td.title='checked '+rec.t;}
+          else if(rec.a===1){var cnt=rec.u?(rec.u.match(/1/g)||[]).length:0; td=el('td',rec.u?cnt+' of '+(rec.of||rec.u.length)+' open':'Open','open'); if(rec.q&&rec.q<=3) td.appendChild(el('small',rec.q+' left')); td.title='checked '+rec.t;}
           else {td=el('td','Full or closed','full'); td.title='checked '+rec.t;}
           tr.appendChild(td);
         });
+        if(dick.length){
+          var open=dick.filter(function(p){var r=data.nights[n][p.id];return r&&r.a===1;}).length;
+          tr.appendChild(open?el('td',open+' of '+dick.length,'open'):el('td','—','none'));
+        }
         tbody.appendChild(tr);
       });
     }

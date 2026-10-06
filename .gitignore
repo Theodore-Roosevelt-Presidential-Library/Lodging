@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .DS_Store
 .env
+.guesty_token.json
+Claude outputs/
+.env.*
+!.env.example

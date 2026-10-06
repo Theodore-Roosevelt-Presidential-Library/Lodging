@@ -75,6 +75,7 @@
     '.btn.ghost{background:transparent;border-color:var(--accent-dark);font-weight:400}',
     '.btn.ghost:hover{background:var(--wash)}',
     'details{border-top:1px solid var(--line);margin-top:1.4em}',
+    'details.first{border-top:0;margin-top:.6em}',
     'summary{cursor:pointer;list-style:none;padding:14px 0;font-family:"Clearface",Georgia,"Times New Roman",serif;font-size:1.2rem;font-weight:700;color:var(--green)}',
     'summary::-webkit-details-marker{display:none}',
     'summary::before{content:"+";display:inline-block;width:1.1em;font-family:inherit}',
@@ -106,6 +107,7 @@
   function nice(iso) { return parse(iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }); }
   function usDate(iso) { var p = iso.split('-'); return p[1] + '/' + p[2] + '/' + p[0]; }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+  function andBits(a, b) { var out = ''; for (var i = 0; i < a.length; i++) out += (a[i] === '1' && b[i] === '1') ? '1' : '0'; return out; }
 
   function checkedText(iso) {
     var d = daysBetween(iso, today());
@@ -136,12 +138,23 @@
   // ---------- availability ----------
   function evaluate(p, data, checkin, nights) {
     if (!p.live) return { status: 'link' };
-    var oldest = null, now = today();
+    var oldest = null, now = today(), mask = null, grouped = false, of = null;
     for (var i = 0; i < nights; i++) {
       var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
       if (!rec || !rec.t || daysBetween(rec.t, now) > STALE_DAYS) return { status: 'unknown' };
       if (rec.a !== 1) return { status: 'unavailable' };
       if (!oldest || rec.t < oldest) oldest = rec.t;
+      if (rec.u) {
+        // One character per cabin or rental. A unit counts only if it is open every night of the stay.
+        grouped = true;
+        of = rec.of || rec.u.length;
+        mask = mask === null ? rec.u : (mask.length === rec.u.length ? andBits(mask, rec.u) : '');
+      }
+    }
+    if (grouped) {
+      var count = (mask.match(/1/g) || []).length;
+      if (!count) return { status: 'unavailable' };
+      return { status: 'available', checked: oldest, count: count, of: of };
     }
     return { status: 'available', checked: oldest };
   }
@@ -166,8 +179,14 @@
     kids.push(h('p', { class: 'meta', text: TYPE_NAME[p.type] + ' · ' + whereText(p) }));
     if (p.blurb) kids.push(h('p', { class: 'blurb', text: p.blurb }));
     if (live) {
-      kids.push(h('p', { class: 'avail', text: p.type === 'camping' ? 'Sites available' : 'Rooms available' }));
-      kids.push(h('p', { class: 'fine', text: checkedText(ev.checked) + '. See rates and book on the property\u2019s site.' }));
+      var headline = p.type === 'camping' ? 'Sites available' : 'Rooms available';
+      var fine = checkedText(ev.checked) + '. See rates and book on the property\u2019s site.';
+      if (ev.count) {
+        headline = p.type === 'rentals' ? plural(ev.count, 'rental', 'rentals') + ' available' : plural(ev.count, 'unit', 'units') + ' available';
+        fine = 'Of ' + ev.of + ' tracked. ' + checkedText(ev.checked) + '.' + (p.type === 'rentals' ? ' More may be listed.' : '');
+      }
+      kids.push(h('p', { class: 'avail', text: headline }));
+      kids.push(h('p', { class: 'fine', text: fine }));
     } else if (p.season) {
       kids.push(h('p', { class: 'season', text: p.season }));
     }
@@ -176,7 +195,7 @@
       actions.push(h('a', {
         class: 'btn', href: link, target: '_blank', rel: 'noopener',
         'aria-label': (live ? 'Book ' : (p.dated_url ? 'Check dates at ' : 'Visit the website for ')) + p.name + ' (opens in a new tab)',
-        text: live ? 'Book' : (p.dated_url ? 'Check dates' : 'Visit website')
+        text: p.type === 'rentals' ? 'See rentals' : (live ? 'Book' : (p.dated_url ? 'Check dates' : 'Visit website'))
       }));
     }
     if (p.phone) {
@@ -201,9 +220,20 @@
 
     results.appendChild(h('p', { class: 'summary', text: nice(checkin) + ' to ' + nice(checkout) + ', ' + plural(state.nights, 'night', 'nights') }));
 
+    // Dickinson is a 35-mile drive, so its open hotels sit in their own fold below the nearer ones.
+    var openNear = open.filter(function (o) { return o.p.area !== 'dickinson'; });
+    var openFar = open.filter(function (o) { return o.p.area === 'dickinson'; });
     if (open.length) {
       results.appendChild(h('h3', null, ['Open for your dates', h('span', { class: 'count', text: plural(open.length, 'place', 'places') + ' with rooms or sites when last checked' })]));
-      results.appendChild(h('div', { class: 'grid' }, open.map(function (o) { return card(o.p, o.ev, checkin, checkout); })));
+      if (openNear.length) {
+        results.appendChild(h('div', { class: 'grid' }, openNear.map(function (o) { return card(o.p, o.ev, checkin, checkout); })));
+      }
+      if (openFar.length) {
+        results.appendChild(h('details', openNear.length ? { class: 'first' } : { class: 'first', open: '' }, [
+          h('summary', null, ['Dickinson, about 35 miles east', h('span', { class: 'count', text: plural(openFar.length, 'hotel', 'hotels') + ' showing rooms' })]),
+          h('div', { class: 'grid' }, openFar.map(function (o) { return card(o.p, o.ev, checkin, checkout); }))
+        ]));
+      }
     }
 
     AREAS.forEach(function (area) {

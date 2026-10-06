@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY.",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip).",
   "properties": [
     {
       "id": "hotel-1883",
@@ -132,6 +132,11 @@
       "dated_url": "https://www.wyndhamhotels.com/americinn/medora-north-dakota/americinn-lodge-and-suites-medora/rooms-rates?checkInDate={in_us}&checkOutDate={out_us}&adults=2&children=0&rooms=1",
       "phone": "701-623-4800",
       "trolley": true,
+      "live": {
+        "source": "google_hotels",
+        "query": "medora",
+        "match": "americinn"
+      },
       "public": true
     },
     {
@@ -192,6 +197,13 @@
       "url": "https://vacationmedora.com/cabin-rentals-medora-belfield-nd",
       "dated_url": "https://vacationmedora.guestybookings.com/en/properties?minOccupancy=2&checkIn={in}&checkOut={out}",
       "phone": "701-501-3344",
+      "live": {
+        "source": "airbnb",
+        "listings": [
+          "840734992575804128",
+          "6844506"
+        ]
+      },
       "public": true
     },
     {
@@ -264,6 +276,26 @@
       "season": "Varies by listing",
       "url": "https://www.airbnb.com/medora-nd/stays",
       "dated_url": "https://www.airbnb.com/s/Medora--ND/homes?checkin={in}&checkout={out}&adults=2",
+      "live": {
+        "source": "airbnb",
+        "listings": [
+          "48740439",
+          "1706929444431274600",
+          "573921940920496377",
+          "1178892400240665803",
+          "1522780397312474727",
+          "1688532697492715707",
+          "53457764",
+          "19661290",
+          "686990376785014055",
+          "896877649297990845",
+          "1447092693241353049",
+          "32477653",
+          "35419952",
+          "1647955611953629978",
+          "17766498"
+        ]
+      },
       "public": true
     },
     {
@@ -277,6 +309,13 @@
       "season": "Varies by listing",
       "url": "https://www.vrbo.com/vacation-rentals/usa/north-dakota/medora",
       "dated_url": "https://www.vrbo.com/search?destination=Medora%2C%20North%20Dakota&startDate={in}&endDate={out}&adults=2",
+      "live": {
+        "source": "vrbo",
+        "start": [
+          "bbox:46.78,-103.75,47.05,-103.30"
+        ],
+        "max_items": 60
+      },
       "public": true
     },
     {
@@ -367,6 +406,11 @@
       "unit_label": "rooms",
       "url": "https://www.trapperskettle.com/lodging/",
       "phone": "800-284-1855",
+      "live": {
+        "source": "google_hotels",
+        "query": "belfield",
+        "match": "trapper"
+      },
       "public": true
     },
     {
@@ -397,6 +441,17 @@
       "url": "https://vacationmedora.com/cabin-rentals-medora-belfield-nd",
       "dated_url": "https://vacationmedora.guestybookings.com/en/properties?minOccupancy=2&checkIn={in}&checkOut={out}",
       "phone": "701-501-3344",
+      "live": {
+        "source": "airbnb",
+        "listings": [
+          "1154377704705002857",
+          "32764606",
+          "1146426078142331124",
+          "1424679336101057413",
+          "934075389740171268",
+          "1665328023364090802"
+        ]
+      },
       "public": true
     },
     {
@@ -591,6 +646,11 @@
       "units": 192,
       "unit_label": "rooms",
       "url": "https://www.bestwestern.com/en_US/book/hotels-in-dickinson/roosevelt-grand-dakota-surestay-collection-by-best-western/propertyCode.35041.html",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "roosevelt grand dakota"
+      },
       "public": true
     },
     {
@@ -606,6 +666,11 @@
       "units": 170,
       "unit_label": "rooms",
       "url": "https://www.stayastoria.com/dickinson-nd",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "astoria"
+      },
       "public": true
     },
     {
@@ -621,6 +686,11 @@
       "units": 117,
       "unit_label": "rooms",
       "url": "https://www.wyndhamhotels.com/baymont/dickinson-north-dakota/baymont-dickinson/overview",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "baymont"
+      },
       "public": true
     },
     {
@@ -636,6 +706,11 @@
       "units": 115,
       "unit_label": "rooms",
       "url": "https://www.choicehotels.com/north-dakota/dickinson/comfort-inn-hotels/nd001",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "comfort inn"
+      },
       "public": true
     },
     {
@@ -651,6 +726,11 @@
       "units": 100,
       "unit_label": "rooms",
       "url": "https://www.redroof.com/property/nd/dickinson/rri319",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "red roof"
+      },
       "public": true
     },
     {
@@ -666,6 +746,11 @@
       "units": 90,
       "unit_label": "rooms",
       "url": "https://www.marriott.com/en-us/hotels/dikts-towneplace-suites-dickinson/overview/",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "towneplace"
+      },
       "public": true
     },
     {
@@ -681,6 +766,11 @@
       "units": 85,
       "unit_label": "rooms",
       "url": "https://www.hilton.com/en/hotels/dikndhx-hampton-suites-dickinson/",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "hampton"
+      },
       "public": true
     },
     {
@@ -696,6 +786,11 @@
       "units": 83,
       "unit_label": "rooms",
       "url": "https://www.wyndhamhotels.com/hawthorn-extended-stay/dickinson-north-dakota/hawthorn-suites-by-wyndham-dickinson/overview",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "hawthorn"
+      },
       "public": true
     },
     {
@@ -711,6 +806,11 @@
       "units": 81,
       "unit_label": "rooms",
       "url": "https://www.ihg.com/candlewood/hotels/us/en/dickinson/dikcw/hoteldetail",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "candlewood"
+      },
       "public": true
     },
     {
@@ -741,6 +841,11 @@
       "units": 79,
       "unit_label": "rooms",
       "url": "http://www.laquintadickinson.com/",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "la quinta"
+      },
       "public": true
     },
     {
@@ -756,6 +861,11 @@
       "units": 79,
       "unit_label": "rooms",
       "url": "https://www.wyndhamhotels.com/microtel/dickinson-north-dakota/microtel-dickinson/overview",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "microtel"
+      },
       "public": true
     },
     {
@@ -771,6 +881,11 @@
       "units": 64,
       "unit_label": "rooms",
       "url": "https://www.myplacehotels.com/my-place-hotel-dickinson-nd",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "my place"
+      },
       "public": true
     },
     {
@@ -786,6 +901,11 @@
       "units": 60,
       "unit_label": "rooms",
       "url": "https://dickinsoninn.com/",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "dickinson inn"
+      },
       "public": true
     },
     {
@@ -801,6 +921,11 @@
       "units": 57,
       "unit_label": "rooms",
       "url": "https://heritagehotel.co/",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "heritage hotel"
+      },
       "public": true
     },
     {
@@ -831,6 +956,11 @@
       "units": 56,
       "unit_label": "rooms",
       "url": "https://www.ihg.com/holidayinnexpress/hotels/us/en/dickinson/dicnd/hoteldetail",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "holiday inn express"
+      },
       "public": true
     },
     {
@@ -846,6 +976,11 @@
       "units": 45,
       "unit_label": "rooms",
       "url": "https://www.wyndhamhotels.com/hotels/52013",
+      "live": {
+        "source": "google_hotels",
+        "query": "dickinson",
+        "match": "americinn"
+      },
       "public": true
     },
     {
