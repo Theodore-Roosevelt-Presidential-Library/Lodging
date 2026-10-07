@@ -59,13 +59,34 @@ SETTINGS = {
     "airbnb": {"horizon": 330},
     "vrbo": {"horizon": 330},
     # One request per campground per month, ten seconds apart (the pause recreation.gov's robots file asks for).
-    "recgov": {"horizon": 330, "delay": 10.0},
+    "recgov": {"horizon": 330, "delay": 10.0, "months": 8},
+    # North Dakota state parks: one request per campground loop per three weeks of dates.
+    "ndparks": {"horizon": 330, "delay": 2.0},
 }
-SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo", "recgov"]
+SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo", "recgov", "ndparks"]
+NDPARKS_API = "https://ndparksrdr.usedirect.com/rdr/rdr"
+# A small Apify scraper that reads recreation.gov month by month, so the requests come from Apify
+# rather than from this collector. Set RECGOV_VIA=direct to ask recreation.gov directly instead.
+APIFY_RECGOV_ACTOR = "hikemetrics~recreation-gov-permit-tracker"
+
+# How hard the scheduled runs work, chosen with LODGING_PACE (default "standard").
+# Per-night sources list (nights ahead, re-check every N days) steps; None means "everything beyond".
+# Calendar sources give the number of days between runs.
+# Google Hotels is the same in both: its plan is a flat monthly rate, so checking less saves nothing.
+PACE = {
+    "standard": {},   # filled in below from SETTINGS: near nights daily, the rest once per cycle
+    "light": {
+        "trmf": [(14, 1), (60, 7), (None, 14)],
+        "airbnb": 3, "vrbo": 3, "guesty": 3,
+        "recgov": 2, "ndparks": 2,
+    },
+}
 RECGOV_ENDPOINT = "https://www.recreation.gov/api/camps/availability/campground/{facility}/month?start_date={month}-01T00%3A00%3A00.000Z"
 RECGOV_OPEN = {"Available"}
 RECGOV_TAKEN = {"Reserved", "Not Available", "Not Available Cutoff", "Closed"}
 RECGOV_IGNORED = {"Not Reservable", "Not Reservable Management"}   # walk-up or staff sites: neither open nor full
+for _source, _cfg in SETTINGS.items():
+    PACE["standard"][_source] = [(_cfg["near"], 1), (None, _cfg["cycle"])] if "cycle" in _cfg else 1
 TIMEOUT_SECONDS = 30
 MAX_CONSECUTIVE_FAILURES = 8
 USER_AGENT = "TRPL-Lodging-Finder/1.0 (Theodore Roosevelt Presidential Library; https://www.trlibrary.com)"
@@ -168,6 +189,26 @@ class Run:
         self.changes: list[list] = []
         self.stats: dict[str, dict] = {}
         self.units: dict[str, list[dict]] = {}   # property id -> its listings, in the order of the "u" characters
+        budget = getattr(args, "max_seconds", 0) or 0
+        self.deadline = time.time() + budget if budget else None
+        self.pace_name = str(self.env.get("LODGING_PACE") or "standard").strip().lower()
+        if self.pace_name not in PACE:
+            self.pace_name = "standard"
+
+    def out_of_time(self) -> bool:
+        """True once --max-seconds has passed. Per-night sources stop cleanly and the next run carries on."""
+        return self.deadline is not None and time.time() >= self.deadline
+
+    def pace(self, source: str):
+        """This source's schedule: the chosen pace, falling back to standard where it says nothing."""
+        return PACE[self.pace_name].get(source, PACE["standard"][source])
+
+    def every(self, source: str, offset: int) -> int:
+        """How many days may pass between checks of the night `offset` days ahead."""
+        for upto, days in self.pace(source):
+            if upto is None or offset < upto:
+                return days
+        return 1
 
     def stat(self, source: str) -> dict:
         return self.stats.setdefault(source, {"requests": 0, "failed": 0, "note": ""})
@@ -177,14 +218,21 @@ class Run:
         return [(self.today + dt.timedelta(days=i)).isoformat() for i in range(days)]
 
     def due(self, source: str) -> list[str]:
-        """Per-night sources: near nights every run, far nights on rotation, anything never checked."""
-        cfg, seen, out = SETTINGS[source], self.checked.get(source, {}), []
+        """Per-night sources: which nights to check on this run.
+
+        Never-checked nights always. Otherwise each night is re-checked every N days (N from the pace):
+        on its own day of the rotation, which spreads the work evenly across daily runs, or as soon as
+        it is N days old, which catches up after skipped runs.
+        """
+        seen, out, today_ord = self.checked.get(source, {}), [], self.today.toordinal()
         for offset, iso in enumerate(self.horizon(source)):
-            ordinal = self.today.toordinal() + offset
-            if seen.get(iso) == self.stamp and not self.args.full:
+            last = seen.get(iso)
+            if last == self.stamp and not self.args.full:
                 continue   # already checked today, so a second run the same day picks up where the first stopped
-            if (self.args.full or offset < cfg["near"] or iso not in seen
-                    or ordinal % cfg["cycle"] == self.today.toordinal() % cfg["cycle"]):
+            every = self.every(source, offset)
+            age = (self.today - dt.date.fromisoformat(last)).days if last else None
+            if (self.args.full or last is None or every <= 1 or age >= every
+                    or (today_ord + offset) % every == today_ord % every):
                 out.append(iso)
         return out[: self.args.limit] if self.args.limit else out
 
@@ -239,6 +287,9 @@ def parse_trmf(payload: dict) -> dict:
 def collect_trmf(run: Run, props: list[dict]) -> None:
     stat, cfg, streak = run.stat("trmf"), SETTINGS["trmf"], 0
     for night in run.due("trmf"):
+        if run.out_of_time():
+            stat["note"] = "stopped at the time limit; run again to carry on"
+            return
         complete = True
         for prop in props:
             stat["requests"] += 1
@@ -332,6 +383,9 @@ def collect_google_hotels(run: Run, props: list[dict]) -> None:
     for prop in props:
         by_query.setdefault(prop["live"]["query"], []).append(prop)
     for night in run.due("google_hotels"):
+        if run.out_of_time():
+            stat["note"] = "stopped at the time limit; run again to carry on"
+            return
         complete = True
         for qkey, qprops in by_query.items():
             text, pages = GOOGLE_QUERIES[qkey]
@@ -665,14 +719,7 @@ def parse_recgov_month(payload) -> dict[str, dict | None]:
     for night, statuses in by_night.items():
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", night):
             continue
-        open_sites = sum(1 for s in statuses if s in RECGOV_OPEN)
-        counted = [s for s in statuses if s not in RECGOV_IGNORED]
-        if open_sites:
-            out[night] = {"a": 1, "q": open_sites}
-        elif counted and all(s in RECGOV_TAKEN for s in counted):
-            out[night] = {"a": 0}
-        else:
-            out[night] = None
+        out[night] = recgov_night(statuses, sum(1 for s in statuses if s in RECGOV_OPEN))
     return out
 
 
@@ -688,7 +735,72 @@ def recgov_months(run: Run) -> list[str]:
     return sorted({n[:7] for n in nights})
 
 
+def recgov_night(statuses: list[str], open_sites: int) -> dict | None:
+    """One night's record from the statuses seen that night and how many sites are open."""
+    counted = [s for s in statuses if s not in RECGOV_IGNORED]
+    if open_sites:
+        return {"a": 1, "q": open_sites}
+    if counted and all(s in RECGOV_TAKEN for s in counted):
+        return {"a": 0}
+    return None
+
+
+def parse_recgov_actor(items: list[dict]) -> dict[str, dict[str, dict | None]]:
+    """Campground id -> night -> record, from the Apify scraper's month-by-month results."""
+    out: dict[str, dict[str, dict | None]] = {}
+    for item in items:
+        fid = str(item.get("targetId") or "")
+        if not fid or item.get("success") is False:
+            continue
+        for day in item.get("availability") or []:
+            night = str(day.get("date") or "")[:10]
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", night):
+                continue
+            statuses = [str(s) for s in day.get("statuses") or []]
+            count = day.get("bookableCampsiteCount")
+            if not isinstance(count, int):
+                count = day.get("availableCampsiteCount") if isinstance(day.get("availableCampsiteCount"), int) else 0
+            if "Available" not in statuses:
+                count = 0   # the scraper also counts "Open" (shown but not yet on sale); only "Available" can be booked
+            elif not count:
+                count = 1
+            out.setdefault(fid, {})[night] = recgov_night(statuses, count)
+    return out
+
+
+def collect_recgov_apify(run: Run, props: list[dict]) -> None:
+    token, stat = apify_token(run), run.stat("recgov")
+    months = recgov_months(run)[: SETTINGS["recgov"]["months"]]   # booking opens about six months ahead
+    targets = [{"checkType": "campground-month", "facilityId": str(int(p["live"]["facility"])), "name": p["name"],
+                "months": months} for p in props]
+    found = parse_recgov_actor(apify_run(APIFY_RECGOV_ACTOR, {"targets": targets}, token, run, "recgov"))
+    horizon, missing = set(run.horizon("recgov")), []
+    for prop in props:
+        nights = found.get(str(int(prop["live"]["facility"])))
+        if nights is None:
+            missing.append(prop["id"])
+            continue
+        for night, rec in nights.items():
+            if night in horizon:
+                run.put(night, prop["id"], rec)
+    if missing:
+        stat["note"] = "no answer for " + ", ".join(missing)
+    if len(missing) < len(props):
+        for night in run.horizon("recgov"):
+            run.mark("recgov", night)
+    else:
+        raise HttpError("the recreation.gov scraper returned nothing")
+
+
 def collect_recgov(run: Run, props: list[dict]) -> None:
+    """Through the Apify scraper by default; straight from recreation.gov when RECGOV_VIA=direct."""
+    if str(run.env.get("RECGOV_VIA") or "apify").strip().lower() == "direct":
+        collect_recgov_direct(run, props)
+    else:
+        collect_recgov_apify(run, props)
+
+
+def collect_recgov_direct(run: Run, props: list[dict]) -> None:
     stat, cfg = run.stat("recgov"), SETTINGS["recgov"]
     horizon, complete = set(run.horizon("recgov")), True
     for prop in props:
@@ -715,8 +827,65 @@ def collect_recgov(run: Run, props: list[dict]) -> None:
             run.mark("recgov", night)
 
 
+# --------------------------------------------------------------------------- North Dakota state parks
+
+def parse_ndparks_grid(payload) -> tuple[dict[str, list[int]], str | None, str | None]:
+    """(night -> [free sites, bookable sites]), the last date covered, and the last date open for booking."""
+    counts: dict[str, list[int]] = {}
+    units = (((payload or {}).get("Facility") or {}).get("Units") or {})
+    for unit in units.values():
+        if unit.get("AllowWebBooking") is False:
+            continue
+        for piece in (unit.get("Slices") or {}).values():
+            night = str(piece.get("Date") or "")[:10]
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", night) or piece.get("IsWalkin"):
+                continue
+            pair = counts.setdefault(night, [0, 0])
+            pair[1] += 1
+            if piece.get("IsFree") and not piece.get("IsBlocked"):
+                pair[0] += 1
+    return counts, str((payload or {}).get("EndDate") or "")[:10] or None, str((payload or {}).get("MaxDate") or "")[:10] or None
+
+
+def collect_ndparks(run: Run, props: list[dict]) -> None:
+    stat, cfg = run.stat("ndparks"), SETTINGS["ndparks"]
+    horizon, last_day, complete = set(run.horizon("ndparks")), run.horizon("ndparks")[-1], True
+    for prop in props:
+        totals: dict[str, list[int]] = {}
+        for facility in prop["live"]["facilities"]:
+            start = run.today
+            for _ in range(30):   # three weeks a request; thirty requests is far past the booking window
+                stat["requests"] += 1
+                body = {"FacilityId": str(int(facility)), "UnitTypeId": 0, "StartDate": start.strftime("%m-%d-%Y"),
+                        "InSeasonOnly": True, "WebOnly": True, "IsADA": False, "SleepingUnitId": 0,
+                        "MinVehicleLength": 0, "UnitCategoryId": 0, "UnitTypesGroupIds": []}
+                try:
+                    counts, end, limit = parse_ndparks_grid(http_json("POST", f"{NDPARKS_API}/search/grid", json_body=body))
+                except (HttpError, ValueError) as exc:
+                    stat["failed"] += 1
+                    complete = False
+                    print(f"  ndparks {prop['id']} loop {facility} from {start}: {exc}", file=sys.stderr)
+                    break
+                for night, (free, bookable) in counts.items():
+                    pair = totals.setdefault(night, [0, 0])
+                    pair[0] += free
+                    pair[1] += bookable
+                run.sleep(cfg["delay"])
+                if not end or not counts or end >= (limit or last_day) or end >= last_day:
+                    break
+                start = dt.date.fromisoformat(end) + dt.timedelta(days=1)
+        for night in horizon:
+            free, bookable = totals.get(night, (0, 0))
+            if not free and night == run.stamp:
+                bookable = 0   # tonight cannot be booked online, but walk-up sites may be open: say nothing
+            run.put(night, prop["id"], {"a": 1, "q": free} if free else ({"a": 0} if bookable else None))
+    if complete:
+        for night in run.horizon("ndparks"):
+            run.mark("ndparks", night)
+
+
 SOURCES = {"trmf": collect_trmf, "google_hotels": collect_google_hotels, "guesty": collect_guesty,
-           "airbnb": collect_airbnb, "vrbo": collect_vrbo, "recgov": collect_recgov}
+           "airbnb": collect_airbnb, "vrbo": collect_vrbo, "recgov": collect_recgov, "ndparks": collect_ndparks}
 
 
 # --------------------------------------------------------------------------- connection check
@@ -762,6 +931,13 @@ def check(run: Run, source: str, props: list[dict]) -> None:
         print(f"  {len(items)} item(s); fields on the first: {sorted(items[0])[:15] if items else []}")
         cal = parse_airbnb_items(items)
         print(f"  parsed calendars: {len(cal)}; days in the first: {len(next(iter(cal.values()))) if cal else 0}")
+    elif source == "ndparks":
+        counts, end, limit = parse_ndparks_grid(http_json("POST", f"{NDPARKS_API}/search/grid", json_body={
+            "FacilityId": str(int(props[0]["live"]["facilities"][0])), "UnitTypeId": 0, "StartDate": run.today.strftime("%m-%d-%Y"),
+            "InSeasonOnly": True, "WebOnly": True, "IsADA": False, "SleepingUnitId": 0, "MinVehicleLength": 0,
+            "UnitCategoryId": 0, "UnitTypesGroupIds": []}))
+        print(f"  {props[0]['name']}: {len(counts)} nights through {end}; booking open through {limit}; "
+              f"{sum(1 for free, _ in counts.values() if free)} nights with open sites")
     elif source == "recgov":
         nights = parse_recgov_month(http_json("GET", RECGOV_ENDPOINT.format(facility=int(props[0]["live"]["facility"]), month=run.stamp[:7])))
         known = [n for n, r in sorted(nights.items()) if r and n >= run.stamp]
@@ -837,6 +1013,13 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
             sprops = [p for p in sprops if p["id"] in only]
         if not sprops:
             continue
+        # Calendar sources (rentals, campgrounds) read the whole horizon at once, so their pace is simply
+        # how many days to leave between runs.
+        gap, last_run = state.pace(source), (previous.get("sources") or {}).get(source, {}).get("at")
+        if (isinstance(gap, int) and gap > 1 and last_run and not (args.full or args.check or args.dry_run or only)
+                and (today - dt.date.fromisoformat(last_run)).days < gap):
+            print(f"{source}: not due (runs every {gap} days, last ran {last_run})")
+            continue
         stat = state.stat(source)
         if args.dry_run:
             if "cycle" in SETTINGS.get(source, {}):
@@ -862,11 +1045,32 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
     if args.dry_run or args.check:
         return summary
 
+    # Another run may have written the file while this one was working (two sources run side by side
+    # during a first fill). Take everything this run did not touch from the file as it is now.
+    ran = set(state.stats)
+    mine = {p["id"] for p in props if (p.get("live") or {}).get("source") in ran}
+    latest = load_json(OUT, {})
+    if latest and latest != previous:
+        fresh = {n: recs for n, recs in (latest.get("nights") or {}).items() if n >= stamp}
+        for night in set(nights) | set(fresh):
+            day, now = nights.setdefault(night, {}), fresh.get(night, {})
+            for pid in [pid for pid in day if pid not in mine]:
+                del day[pid]
+            day.update({pid: rec for pid, rec in now.items() if pid not in mine and pid in live_ids})
+        for source, seen in (latest.get("checked") or {}).items():
+            if source not in ran:
+                checked[source] = {n: t for n, t in seen.items() if n >= stamp}
+        for pid, units in (latest.get("units") or {}).items():
+            if pid not in mine and pid in listed:
+                state.units[pid] = units
+        previous = latest
+
     out = {
         "generated_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "horizon_nights": MAX_HORIZON,
         "basis": "Whether a stay for two adults could be booked when checked. Rates are not collected.",
         "sources_enabled": enabled,
+        "pace": state.pace_name,
         # Each source keeps its last result, so a run of one source does not wipe the others off the monitor.
         "sources": {**{s: v for s, v in (previous.get("sources") or {}).items() if s in sources},
                     **{s: {"ok": v.get("ok", False), "note": v.get("note", ""), "at": stamp} for s, v in state.stats.items()}},
@@ -877,7 +1081,9 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
         "checked": {s: dict(sorted(v.items())) for s, v in checked.items() if v},
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    scratch = OUT.with_suffix(".json.tmp")   # write beside the file, then swap, so a reader never sees half a file
+    scratch.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    os.replace(scratch, OUT)
     append_changes(state.changes)
     hints = {pid: h for pid, h in state.photo_hints.items() if pid in state.photo_targets}
     if json.dumps(hints, sort_keys=True) != hints_before:
@@ -902,6 +1108,8 @@ def main(argv=None) -> int:
     ap.add_argument("--sources", default=os.environ.get("LODGING_SOURCES", ""),
                     help="comma-separated sources to run (default: $LODGING_SOURCES)")
     ap.add_argument("--props", default="", help="comma-separated property ids to limit the run to (testing)")
+    ap.add_argument("--max-seconds", type=int, default=0,
+                    help="per-night sources stop starting new nights after this long and save what they have")
     args = ap.parse_args(argv)
     summary = run(args)
     ran = [v for v in summary["sources"].values() if "ok" in v and not str(v.get("note", "")).startswith("skipped")]

@@ -34,7 +34,9 @@
   if (host.shadowRoot) return;
   var root = host.attachShadow({ mode: 'open' });
 
-  var STALE_DAYS = 10;
+  var STALE_DAYS = 10;        // an answer older than this is not shown...
+  var STALE_DAYS_FAR = 16;    // ...except for nights more than two months out, which change slowly
+  var FAR_NIGHTS = 60;
   var MAX_NIGHTS = 7;
   var TYPES = [
     { key: 'all', label: 'All' },
@@ -232,12 +234,16 @@
   }
 
   // ---------- availability ----------
+  function tooOld(rec, night, now) {
+    var limit = daysBetween(now, night) > FAR_NIGHTS ? STALE_DAYS_FAR : STALE_DAYS;
+    return !rec || !rec.t || daysBetween(rec.t, now) > limit;
+  }
   function evaluate(p, data, checkin, nights) {
     if (!p.live) return { status: 'link' };
     var oldest = null, now = today(), mask = null, grouped = false, of = null;
     for (var i = 0; i < nights; i++) {
-      var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
-      if (!rec || !rec.t || daysBetween(rec.t, now) > STALE_DAYS) return { status: 'unknown' };
+      var night = addDays(checkin, i), rec = (data.nights[night] || {})[p.id];
+      if (tooOld(rec, night, now)) return { status: 'unknown' };
       if (!oldest || rec.t < oldest) oldest = rec.t;
       if (rec.a !== 1) return { status: 'unavailable', checked: oldest, of: rec.u ? (rec.of || rec.u.length) : null };
       if (rec.u) {
@@ -259,8 +265,8 @@
   function unitMask(p, units, data, checkin, nights) {
     var mask = null, oldest = null, now = today();
     for (var i = 0; i < nights; i++) {
-      var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
-      if (!rec || !rec.t || !rec.u || rec.u.length !== units.length || daysBetween(rec.t, now) > STALE_DAYS) return null;
+      var night = addDays(checkin, i), rec = (data.nights[night] || {})[p.id];
+      if (tooOld(rec, night, now) || !rec.u || rec.u.length !== units.length) return null;
       mask = mask === null ? rec.u : andBits(mask, rec.u);
       if (!oldest || rec.t < oldest) oldest = rec.t;
     }

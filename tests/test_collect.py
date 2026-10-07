@@ -20,7 +20,7 @@ TODAY = dt.date(2026, 10, 5)
 
 
 def args(**kw):
-    base = dict(full=False, dry_run=False, check=False, limit=0, sources="")
+    base = dict(full=False, dry_run=False, check=False, limit=0, sources="", props="", max_seconds=0)
     base.update(kw)
     return SimpleNamespace(**base)
 
@@ -457,6 +457,9 @@ def site(**days):
             "quantities": {}}
 
 
+DIRECT = {"RECGOV_VIA": "direct"}
+
+
 class RecGov(Sandbox):
     PROPS = [{"id": "camp", "name": "Camp", "public": True, "live": {"source": "recgov", "facility": 251160}}]
     MONTHS = {
@@ -487,7 +490,7 @@ class RecGov(Sandbox):
 
     def test_run_stops_asking_once_nothing_is_bookable(self):
         sleeps = []
-        summary = collect.run(args(sources="recgov"), today=TODAY, sleep=sleeps.append, env={})
+        summary = collect.run(args(sources="recgov"), today=TODAY, sleep=sleeps.append, env=DIRECT)
         nights = self.out()["nights"]
         self.assertEqual(nights["2026-10-05"]["camp"], {"a": 1, "q": 2, "t": "2026-10-05"})
         self.assertEqual(nights["2026-10-06"]["camp"], {"a": 0, "t": "2026-10-05"})
@@ -497,14 +500,169 @@ class RecGov(Sandbox):
         self.assertTrue(summary["sources"]["recgov"]["ok"])
 
     def test_a_night_that_drops_out_of_the_booking_window_is_cleared(self):
-        collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={})
+        collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env=DIRECT)
         self.MONTHS = {"2026-10": {"campsites": {"1": site(d05="NYR", d06="Reserved")}}}
-        collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={})
+        collect.run(args(sources="recgov", full=True), today=TODAY, sleep=lambda s: None, env=DIRECT)
         self.assertNotIn("2026-10-05", self.out()["nights"])
 
     def test_props_flag_limits_the_run(self):
-        collect.run(args(sources="recgov", props="someone-else"), today=TODAY, sleep=lambda s: None, env={})
+        collect.run(args(sources="recgov", props="someone-else"), today=TODAY, sleep=lambda s: None, env=DIRECT)
         self.assertEqual(self.calls, [])
+
+
+class RecGovThroughApify(Sandbox):
+    PROPS = [{"id": "camp", "name": "Camp", "public": True, "live": {"source": "recgov", "facility": 251160}},
+             {"id": "horse", "name": "Horse Camp", "public": True, "live": {"source": "recgov", "facility": 251161}}]
+    ITEMS = [
+        {"targetId": "251160", "month": "2026-10", "success": True, "availability": [
+            {"date": "2026-10-05", "statuses": ["Available", "Reserved"], "available": True, "bookable": True, "availableCampsiteCount": 24, "bookableCampsiteCount": 24},
+            {"date": "2026-10-06", "statuses": ["Reserved", "Not Reservable"], "available": False, "bookable": False, "bookableCampsiteCount": 0},
+            {"date": "2026-10-07", "statuses": ["NYR"], "available": False, "bookable": False, "bookableCampsiteCount": 0},
+            {"date": "2026-10-08", "statuses": ["Closed"], "available": False, "bookable": False, "bookableCampsiteCount": 0},
+            {"date": "2026-10-09", "statuses": ["Closed", "Open"], "available": True, "bookable": True, "bookableCampsiteCount": 37}]},
+        {"targetId": "251161", "month": "2026-10", "success": False, "availability": []},
+    ]
+
+    def respond(self, method, url, headers, json_body, form):
+        self.assertEqual(headers.get("Authorization"), "Bearer TOKEN")
+        if method == "POST" and "/acts/hikemetrics~recreation-gov-permit-tracker/runs" in url:
+            self.assertEqual([t["facilityId"] for t in json_body["targets"]], ["251160", "251161"])
+            self.assertEqual(json_body["targets"][0]["checkType"], "campground-month")
+            self.assertEqual(json_body["targets"][0]["months"][0], "2026-10")
+            self.assertEqual(len(json_body["targets"][0]["months"]), 8)
+            return {"data": {"id": "runR", "status": "SUCCEEDED", "defaultDatasetId": "dsR"}}
+        if "/datasets/dsR/items" in url:
+            return self.ITEMS
+        raise AssertionError(url)
+
+    def test_requests_go_through_apify_not_to_recreation_gov(self):
+        summary = collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        self.assertFalse(any("recreation.gov" in c[1] for c in self.calls))
+        nights = self.out()["nights"]
+        self.assertEqual(nights["2026-10-05"]["camp"], {"a": 1, "q": 24, "t": "2026-10-05"})
+        self.assertEqual(nights["2026-10-06"]["camp"], {"a": 0, "t": "2026-10-05"})
+        self.assertNotIn("2026-10-07", nights)                        # not released yet: unknown
+        self.assertEqual(nights["2026-10-08"]["camp"], {"a": 0, "t": "2026-10-05"})
+        self.assertNotIn("2026-10-09", nights)                        # "Open" is shown but not yet on sale: unknown
+        self.assertIn("no answer for horse", summary["sources"]["recgov"]["note"])
+
+    def test_no_token_means_skipped_not_a_quiet_switch_to_direct(self):
+        summary = collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={})
+        self.assertEqual(self.calls, [])
+        self.assertTrue(summary["sources"]["recgov"]["note"].startswith("skipped"))
+
+
+# ----------------------------------------------------------------------------- ND state parks
+
+def unit(web=True, **days):
+    return {"AllowWebBooking": web, "Slices": {f"2026-10-{d[1:]}T00:00:00": dict({"Date": f"2026-10-{d[1:]}", "IsFree": False, "IsBlocked": False, "IsWalkin": False}, **v)
+                                               for d, v in days.items()}}
+
+
+class NdParks(Sandbox):
+    PROPS = [{"id": "park", "name": "State Park", "public": True, "live": {"source": "ndparks", "facilities": [113, 133]}}]
+    FREE, TAKEN, WALK, BLOCKED = {"IsFree": True}, {"IsFree": False}, {"IsFree": True, "IsWalkin": True}, {"IsFree": True, "IsBlocked": True}
+
+    def respond(self, method, url, headers, json_body, form):
+        self.assertEqual((method, url), ("POST", "https://ndparksrdr.usedirect.com/rdr/rdr/search/grid"))
+        self.assertEqual(json_body["StartDate"], "10-05-2026")
+        if json_body["FacilityId"] == "113":
+            units = {"1": unit(d05=self.FREE, d06=self.TAKEN, d07=self.WALK), "2": unit(d05=self.FREE, d06=self.BLOCKED, d07=self.WALK),
+                     "9": unit(web=False, d06=self.FREE)}
+        else:
+            units = {"3": unit(d05=self.TAKEN, d06=self.TAKEN)}
+        return {"Facility": {"Units": units}, "EndDate": "2026-10-25", "MaxDate": "2026-10-25"}
+
+    def test_loops_are_added_together(self):
+        collect.run(args(sources="ndparks"), today=TODAY, sleep=lambda s: None, env={})
+        nights = self.out()["nights"]
+        self.assertEqual(nights["2026-10-05"]["park"], {"a": 1, "q": 2, "t": "2026-10-05"})   # two free sites in one loop
+        self.assertEqual(nights["2026-10-06"]["park"], {"a": 0, "t": "2026-10-05"})           # taken, blocked or staff-only
+        self.assertNotIn("2026-10-07", nights)                                                # walk-up only: cannot say
+        self.assertEqual(len(self.calls), 2)                                                  # one request per loop: booking window reached
+
+
+# ----------------------------------------------------------------------------- pace, side-by-side runs, time budget
+
+class Pace(Sandbox):
+    PROPS = [{"id": "h", "name": "H", "public": True, "live": {"source": "trmf", "hotel_id": 1}},
+             {"id": "bnb", "name": "B", "public": True, "live": {"source": "airbnb", "listings": ["111"]}}]
+
+    def respond(self, method, url, headers, json_body, form):
+        if "bookings.medora.com" in url:
+            return {"available": 1, "price": 100}
+        if method == "POST" and "/acts/" in url:
+            return {"data": {"id": "runA", "status": "SUCCEEDED", "defaultDatasetId": "dsA"}}
+        if "/datasets/dsA/items" in url:
+            return [{"listingId": "111", "days": [{"calendarDate": "2026-10-05", "available": True}, {"calendarDate": "2026-10-09", "available": True}]}]
+        raise AssertionError(url)
+
+    def due_tomorrow(self, pace):
+        run = make_run()
+        for night in run.horizon("trmf"):
+            run.mark("trmf", night)
+        later = collect.Run(TODAY + dt.timedelta(days=1), args(), {}, run.checked, sleep=lambda s: None, env={"LODGING_PACE": pace})
+        return later.due("trmf")
+
+    def test_light_pace_checks_fewer_nights_a_day(self):
+        standard, light = self.due_tomorrow("standard"), self.due_tomorrow("light")
+        self.assertGreater(len(standard), 80)
+        self.assertLess(len(light), 50)
+        self.assertEqual(light[:14], standard[:14])                    # the nearest two weeks are still daily
+        self.assertEqual(len(self.due_tomorrow("nonsense")), len(standard))   # an unknown pace means standard
+
+    def test_nothing_goes_longer_than_its_interval_even_if_runs_are_skipped(self):
+        run = make_run()
+        for night in run.horizon("trmf"):
+            run.mark("trmf", night)
+        later = collect.Run(TODAY + dt.timedelta(days=14), args(), {}, run.checked, sleep=lambda s: None, env={"LODGING_PACE": "light"})
+        self.assertEqual(len(later.due("trmf")), collect.SETTINGS["trmf"]["horizon"])   # old nights are 14 days old, new ones never checked
+
+    def test_light_pace_runs_rentals_every_third_day(self):
+        env = {"APIFY_TOKEN": "TOKEN", "LODGING_PACE": "light"}
+        collect.run(args(sources="airbnb"), today=TODAY, sleep=lambda s: None, env=env)
+        calls = len(self.calls)
+        collect.run(args(sources="airbnb"), today=TODAY + dt.timedelta(days=2), sleep=lambda s: None, env=env)
+        self.assertEqual(len(self.calls), calls)                       # not due yet
+        self.assertEqual(self.out()["sources"]["airbnb"]["at"], "2026-10-05")
+        self.assertIn("2026-10-09", self.out()["nights"])              # and the earlier answers are kept
+        collect.run(args(sources="airbnb"), today=TODAY + dt.timedelta(days=3), sleep=lambda s: None, env=env)
+        self.assertGreater(len(self.calls), calls)
+        self.assertEqual(self.out()["pace"], "light")
+
+    def test_two_runs_side_by_side_do_not_lose_each_others_work(self):
+        collect.run(args(sources="airbnb"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        original = self.respond
+
+        def respond(method, url, headers, json_body, form):
+            if "bookings.medora.com" in url and not getattr(self, "_other_ran", False):
+                self._other_ran = True      # while this run is working, another run rewrites the file
+                data = json.loads(collect.OUT.read_text())
+                data["nights"]["2026-10-05"]["bnb"] = {"a": 0, "u": "0", "of": 1, "t": "2026-10-05"}
+                data["checked"]["airbnb"]["2026-10-05"] = "2026-10-05"
+                data["sources"]["airbnb"]["note"] = "written by the other run"
+                collect.OUT.write_text(json.dumps(data))
+            return original(method, url, headers, json_body, form)
+        self.respond = respond
+        collect.run(args(sources="trmf", limit=2), today=TODAY, sleep=lambda s: None, env={})
+        out = self.out()
+        self.assertEqual(out["nights"]["2026-10-05"]["bnb"]["a"], 0)             # the other run's answer survives
+        self.assertEqual(out["nights"]["2026-10-05"]["h"]["a"], 1)               # and so does this one's
+        self.assertEqual(out["sources"]["airbnb"]["note"], "written by the other run")
+
+    def test_time_budget_stops_cleanly_and_saves(self):
+        collect.run(args(sources="trmf", max_seconds=-1), today=TODAY, sleep=lambda s: None, env={})
+        self.assertEqual(self.calls, [])
+        clock = iter(range(0, 1000, 10))
+        real = collect.time.time
+        collect.time.time = lambda: next(clock)
+        try:
+            summary = collect.run(args(sources="trmf", max_seconds=25), today=TODAY, sleep=lambda s: None, env={})
+        finally:
+            collect.time.time = real
+        self.assertIn("time limit", summary["sources"]["trmf"]["note"])
+        self.assertEqual(len(self.out()["nights"]), len(self.calls))   # every night asked about was saved
+        self.assertLess(len(self.calls), 10)
 
 
 class EnvFile(unittest.TestCase):
@@ -559,6 +717,8 @@ class RealPropertyFile(unittest.TestCase):
                 self.assertIsInstance(live["hotel_id"], int)
             if live["source"] == "recgov":
                 self.assertIsInstance(live["facility"], int)
+            if live["source"] == "ndparks":
+                self.assertTrue(all(isinstance(f, int) for f in live["facilities"]))
         airbnb_ids = [i for p in props if (p.get("live") or {}).get("source") == "airbnb" for i in p["live"]["listings"]]
         self.assertEqual(len(airbnb_ids), len(set(airbnb_ids)), "an Airbnb listing is assigned to two properties")
 

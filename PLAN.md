@@ -34,8 +34,9 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 | Collector: Airbnb and Vrbo (`airbnb`, `vrbo`) | Tested live Oct 5; full 330-night calendars |
 | Vacation Medora cabins | Read from their Airbnb calendars (see below); the `guesty` collector is kept but unused |
 | Photos (`collector/photos.py`) | Done; see "Photos" below |
-| Collector: recreation.gov campgrounds (`recgov`) | Tested live Oct 7; three campgrounds |
-| Offline tests | 61 pass; they use canned responses shaped like each service's documentation |
+| Collector: recreation.gov campgrounds (`recgov`) | Tested live Oct 7; three campgrounds, through Apify |
+| Collector: ND state parks (`ndparks`) | Tested live Oct 7; Rough Rider State Park |
+| Offline tests | 69 pass; they use canned responses shaped like each service's documentation |
 | Daily workflow | Written; `.github/workflows/collect.yml` is not in the repository yet, so nothing refreshes on its own |
 | Pages site | Live at lodging.labs.trlibrary.com |
 
@@ -79,15 +80,42 @@ Google Hotels shows rates for AmericInn Medora, Trapper's Inn and the Dickinson 
 
 What decides whether a card says "Open", "Full" or "Check dates directly":
 
-1. Whether the daily refresh runs. Until `.github/workflows/collect.yml` is in the repository, the only data is from hand runs. On Oct 7 the folder was filled by hand: Medora Foundation properties through Nov 16, Google Hotels through Nov 6, Airbnb and Vrbo for 330 nights, recreation.gov for six months. Anything older than ten days is shown as "check directly".
-2. Whether the property has a source. Of 50 property cards, 30 can now show a live answer: 5 Medora Foundation, 18 through Google Hotels, 3 on recreation.gov, 2 Vacation Medora cabin groups, and 2 (Dakota Place Lodge, King's Guest Ranch) through their own Airbnb and Vrbo listings. All 27 rental listings are live.
-3. The other 20 have nothing to read: two Forest Service campgrounds are first come, first served (and now say so); the rest take bookings by phone, by their own website, or through the state park system, which blocks automated checks.
+1. Whether the daily refresh runs. Until `.github/workflows/collect.yml` is in the repository, the only data is from hand runs. On Oct 7 the whole horizon was filled by hand from Matt's computer. Anything older than ten days (sixteen for nights more than two months out) is shown as "check directly".
+2. Whether the property has a source. Of 50 property cards, 31 can now show a live answer: 5 Medora Foundation, 18 through Google Hotels, 3 on recreation.gov, 1 state park, 2 Vacation Medora cabin groups, and 2 (Dakota Place Lodge, King's Guest Ranch) through their own Airbnb and Vrbo listings. All 27 rental listings are live.
+3. The other 19: three campgrounds on Campspot (decided against); two Forest Service campgrounds that are first come, first served (and now say so); the rest take bookings by phone or through their own website.
+
+## Rule for new sources (Matt, Oct 7)
+
+1. Wherever a property has a booking system, look for real-time availability before settling for "check dates directly".
+2. Before reading a site directly, check whether a scraper for it already exists on Apify, so the requests do not come from the Library.
+
+How each source stands against that rule:
+
+| Source | Apify scraper? | What is used |
+|---|---|---|
+| recreation.gov | Three exist. `hikemetrics/recreation-gov-permit-tracker` charges $0.0025 per campground-month, about 6 cents a run. (`jungle_synthesizer/...` charges per site per day, about $8 a run, so it was not used.) | The Apify scraper. `RECGOV_VIA=direct` switches to direct requests. |
+| Airbnb, Vrbo | Yes | Apify scrapers (since Oct 5) |
+| ND state parks | None | Direct. The site has no robots.txt; about 20 requests a run. |
+| Campspot | None | Not built, by decision. See below. |
+| Medora Foundation | None | Direct, labeled as the Library (confirmed by Matt, Oct 7). Still worth telling the Foundation; a visible partner is a better look than anonymous traffic. |
 
 ## recreation.gov
 
-Cottonwood Campground (251160), Roundup Group Horse Camp (251161) and Buffalo Gap Campground (246796) are booked through recreation.gov. Its official data service (RIDB) does not include availability, so the `recgov` source reads the same month-by-month lookup the site's own pages use. That lookup sits under `/api`, which the site's `robots.txt` disallows, with a requested ten-second pause between requests. The source keeps that pause and makes about 30 requests a day. Matt asked for this source on Oct 7; it runs only when `recgov` is in `LODGING_SOURCES`.
+Cottonwood Campground (251160), Roundup Group Horse Camp (251161) and Buffalo Gap Campground (246796). recreation.gov's official data service (RIDB) does not include availability, so every route reads the month-by-month lookup the site's own pages use, which sits under `/api` (disallowed by the site's `robots.txt`). By default that is done by the Apify scraper. The scraper counts "Open" nights (shown but not yet on sale) as bookable; the collector does not, and treats only "Available" as open.
 
 Nights more than about six months out are not released for booking and show as "check directly". Buffalo Gap shows nothing until its season is released.
+
+## ND state parks
+
+Rough Rider State Park is place 63 in the state reservation system (reservendparks.com), with three loops: 113 Rustler, 133 Rancher, 134 Wrangler. Booking opens about six months ahead. No other state park is within reach of Medora.
+
+## Campspot (decided against, Oct 7)
+
+Boots Campground (`bootsbarmedora`, park 165), The Crossings Campground (`thecrossingscampground`) and Whispering Pines (`whisperingpinescampground`) all book through Campspot. Its robots.txt allows the booking pages, but its servers answer 403 to anything that is not a real browser, including this collector under its own name. Disguising the collector as a browser is out. The route that fits the Apify rule: Apify's general-purpose browser scraper (`apify/playwright-scraper`) with a short script that opens each booking page and reads the availability the page itself loads. Matt decided against it on Oct 7: the Library does not want to maintain a custom scraper. These three campgrounds stay "check dates directly", with links that open Campspot on the chosen dates.
+
+## Ferris Inn, Wooly Boys Inn, Hyde House
+
+These share the Rough Riders booking engine (hotel 62700, named "Rough Riders Hotel, Ferris Inn, Wooly Boys Inn, & Hyde House"). For every date sampled on Oct 7 (October, November, June and July) the lookup returned only Rough Riders room types (codes starting `RR`). So the "Rough Riders Hotel and historic inns" card currently reflects Rough Riders rooms only. Either the inn rooms are not on sale yet for next season or the quick lookup does not list them. Re-check in spring; if inn room codes appear, each inn can get its own card.
 
 ## The Medora Foundation source
 
@@ -123,7 +151,7 @@ Guesty credentials are not obtainable, so these cabins are read from their Airbn
 
 Reading the operator's own booking site (vacationmedora.guestybookings.com) was tried and dropped. Its robots.txt allows crawling, but the data behind it comes from Guesty's servers, which return empty responses to anything that is not a full browser. Getting past that would mean imitating a browser to defeat Guesty's filtering, which this project does not do.
 
-Not planned: ND Parks (blocks automated checks); Campspot (needs a headless browser); phone-only properties.
+Not planned: phone-only properties.
 
 ## Known limits
 

@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. live.source recgov (facility: the recreation.gov campground number). units_from lets a property card take its availability from named Airbnb or Vrbo listings tracked under another entry ({entry id: [listing ids]}). first_come true marks a campground that takes no reservations. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. live.source recgov (facility: the recreation.gov campground number) or ndparks (facilities: the loop numbers in the ND state parks reservation system). units_from lets a property card take its availability from named Airbnb or Vrbo listings tracked under another entry ({entry id: [listing ids]}). first_come true marks a campground that takes no reservations. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
   "trolley_months": [6, 7, 8, 9],
   "trolley_note": "Months when the free Medora trolley runs (trlibrary.com/visit/trolley: June through September). The widget mentions the trolley only for stays that fall entirely inside these months.",
   "properties": [
@@ -376,6 +376,8 @@
     },
     {
       "id": "rough-rider-state-park",
+      "dated_url": "https://reservendparks.com/Web/",
+      "live": {"source": "ndparks", "facilities": [113, 133, 134]},
       "photo_search": "Rough Rider State Park, Medora, ND",
       "name": "Rough Rider State Park",
       "type": "camping",
