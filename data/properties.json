@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. live.source recgov (facility: the recreation.gov campground number). units_from lets a property card take its availability from named Airbnb or Vrbo listings tracked under another entry ({entry id: [listing ids]}). first_come true marks a campground that takes no reservations. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
   "trolley_months": [6, 7, 8, 9],
   "trolley_note": "Months when the free Medora trolley runs (trlibrary.com/visit/trolley: June through September). The widget mentions the trolley only for stays that fall entirely inside these months.",
   "properties": [
@@ -161,6 +161,7 @@
     },
     {
       "id": "dakota-place-lodge",
+      "units_from": {"vrbo-medora": ["7610965ha", "7610966ha", "7610968ha", "7872334ha", "9795360ha"], "airbnb-medora": ["32477653", "35419952"]},
       "photo_match": "dakota place lodge",
       "name": "Dakota Place Lodge and Maltese Ranch Cabin",
       "type": "cabin",
@@ -194,6 +195,7 @@
     },
     {
       "id": "boots-cabins",
+      "units_from": {"vrbo-medora": ["716247", "742272"]},
       "photo": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
       "name": "Boots cabins and Boots House",
       "type": "cabin",
@@ -252,6 +254,7 @@
     },
     {
       "id": "kings-guest-ranch",
+      "units_from": {"airbnb-medora": ["17766498"]},
       "photo_match": "king's guest ranch",
       "photo_search": "King's Guest Ranch, Medora, ND",
       "name": "King's Guest Ranch",
@@ -388,6 +391,8 @@
     },
     {
       "id": "cottonwood-campground",
+      "dated_url": "https://www.recreation.gov/camping/campgrounds/251160",
+      "live": {"source": "recgov", "facility": 251160},
       "photo_match": "cottonwood campground",
       "photo_search": "Cottonwood Campground, Theodore Roosevelt National Park, ND",
       "name": "Cottonwood Campground, Theodore Roosevelt National Park",
@@ -404,6 +409,8 @@
     },
     {
       "id": "buffalo-gap-campground",
+      "dated_url": "https://www.recreation.gov/camping/campgrounds/246796",
+      "live": {"source": "recgov", "facility": 246796},
       "photo_match": "buffalo gap campground",
       "photo_search": "Buffalo Gap Campground, Medora, ND",
       "name": "Buffalo Gap Campground",
@@ -412,7 +419,7 @@
       "area": "medora",
       "miles": 6,
       "direction": "west",
-      "blurb": "Forest Service campground with paved sites and showers in summer. No hookups.",
+      "blurb": "Forest Service campground with paved sites and showers in summer. No hookups. Reserved through recreation.gov.",
       "season": "Open year-round",
       "units": 36,
       "unit_label": "sites",
@@ -616,6 +623,7 @@
     },
     {
       "id": "coal-creek-campground",
+      "first_come": true,
       "photo_search": "Coal Creek Campground, Maah Daah Hey Trail, Medora, ND",
       "name": "Coal Creek Campground",
       "type": "camping",
@@ -632,6 +640,7 @@
     },
     {
       "id": "wannagan-campground",
+      "first_come": true,
       "photo_search": "Wannagan Campground, Maah Daah Hey Trail, ND",
       "name": "Wannagan Campground",
       "type": "camping",
@@ -648,6 +657,8 @@
     },
     {
       "id": "roundup-horse-camp",
+      "dated_url": "https://www.recreation.gov/camping/campgrounds/251161",
+      "live": {"source": "recgov", "facility": 251161},
       "photo_search": "Roundup Group Horse Campground, Theodore Roosevelt National Park, ND",
       "name": "Roundup Group Horse Camp, Theodore Roosevelt National Park",
       "type": "camping",

@@ -130,9 +130,23 @@ class Planning(unittest.TestCase):
         self.assertEqual(len(run.due("trmf")), collect.SETTINGS["trmf"]["horizon"])
         for night in run.horizon("trmf"):
             run.mark("trmf", night)
+        self.assertEqual(run.due("trmf"), [])       # everything was checked today: nothing left to do today
         cfg = collect.SETTINGS["trmf"]
         far = cfg["horizon"] - cfg["near"]
-        self.assertIn(len(run.due("trmf")), (cfg["near"] + far // cfg["cycle"], cfg["near"] + far // cfg["cycle"] + 1))
+        tomorrow = collect.Run(TODAY + dt.timedelta(days=1), args(), {}, run.checked, sleep=lambda s: None, env={})
+        due = tomorrow.due("trmf")
+        self.assertIn(len(due), (cfg["near"] + far // cfg["cycle"], cfg["near"] + far // cfg["cycle"] + 1, cfg["near"] + far // cfg["cycle"] + 2))
+
+    def test_a_second_run_the_same_day_carries_on_where_the_first_stopped(self):
+        first = make_run(limit=10)
+        nights = first.due("trmf")
+        self.assertEqual(len(nights), 10)
+        for night in nights:
+            first.mark("trmf", night)
+        second = collect.Run(TODAY, args(limit=10), {}, first.checked, sleep=lambda s: None, env={})
+        self.assertEqual(second.due("trmf")[0], (TODAY + dt.timedelta(days=10)).isoformat())
+        again = collect.Run(TODAY, args(limit=10, full=True), {}, first.checked, sleep=lambda s: None, env={})
+        self.assertEqual(again.due("trmf")[0], TODAY.isoformat())           # --full still starts over
 
     def test_google_horizon_is_shorter(self):
         self.assertEqual(len(make_run().due("google_hotels")), collect.SETTINGS["google_hotels"]["horizon"])
@@ -211,6 +225,12 @@ class GoogleHotels(Sandbox):
         self.assertEqual(hints["americinn"]["src"], "https://lh3.googleusercontent.com/a/DICKINSON=w640-h360-n-k-no")
         self.assertNotIn("201", collect.PHOTO_HINTS.read_text())
         self.assertNotIn("trolley_months", collect.PHOTO_HINTS.read_text())
+
+    def test_a_town_with_nothing_listed_is_not_a_failure(self):
+        self.respond = lambda *a, **k: {"error": "Google Hotels didn't return any results."}
+        summary = collect.run(args(sources="google_hotels", limit=1), today=TODAY, sleep=lambda s: None, env={"SEARCHAPI_KEY": "KEY"})
+        self.assertEqual(summary["sources"]["google_hotels"]["failed"], 0)
+        self.assertTrue(summary["sources"]["google_hotels"]["ok"])
 
     def test_name_matching_does_not_cross_wires(self):
         results = [{"name": "Hampton Inn & Suites Dickinson", "price_per_night": {"extracted_price": 1}}]
@@ -407,6 +427,13 @@ class Apify(Sandbox):
             self.assertNotIn(private, text)
         self.assertIn("1 left out for a low guest rating", summary["sources"]["vrbo"]["note"])
 
+    def test_each_source_keeps_its_last_result(self):
+        collect.run(args(sources="vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        collect.run(args(sources="airbnb"), today=TODAY + dt.timedelta(days=1), sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        sources = self.out()["sources"]
+        self.assertEqual(sources["vrbo"], {"ok": True, "note": "", "at": "2026-10-05"})
+        self.assertEqual(sources["airbnb"]["at"], "2026-10-06")
+
     def test_listing_details_survive_a_run_of_another_source(self):
         self.listed()
         collect.run(args(sources="vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
@@ -421,6 +448,63 @@ class Apify(Sandbox):
         self.assertEqual(self.out()["nights"], {})
         self.assertIn("failed", summary["sources"]["airbnb"]["note"])
         self.assertFalse(summary["sources"]["vrbo"]["ok"])
+
+
+# ----------------------------------------------------------------------------- recreation.gov
+
+def site(**days):
+    return {"campsite_type": "STANDARD NONELECTRIC", "availabilities": {f"2026-10-{d[1:]}T00:00:00Z": s for d, s in days.items()},
+            "quantities": {}}
+
+
+class RecGov(Sandbox):
+    PROPS = [{"id": "camp", "name": "Camp", "public": True, "live": {"source": "recgov", "facility": 251160}}]
+    MONTHS = {
+        "2026-10": {"campsites": {
+            "1": site(d05="Available", d06="Reserved", d07="Reserved", d08="NYR", d09="Not Reservable", d10="Closed"),
+            "2": site(d05="Available", d06="Reserved", d07="Not Reservable", d08="NYR", d09="Not Reservable", d10="Closed"),
+            "3": site(d05="Reserved", d06="Not Available", d07="Not Reservable Management", d08="NYR", d09="Not Reservable", d10="Closed"),
+        }},
+        # a winter month of walk-up camping does not end the run; the first month not yet released does
+        "2026-11": {"campsites": {"1": {"availabilities": {"2026-11-03T00:00:00Z": "Not Reservable"}}}},
+        "2026-12": {"campsites": {"1": site(), "2": {"availabilities": {"2026-12-03T00:00:00Z": "NYR"}}}},
+    }
+
+    def respond(self, method, url, headers, json_body, form):
+        self.assertTrue(url.startswith("https://www.recreation.gov/api/camps/availability/campground/251160/month?start_date="))
+        month = url.split("start_date=")[1][:7]
+        self.assertTrue(url.endswith("-01T00%3A00%3A00.000Z"))
+        return self.MONTHS.get(month, {"campsites": {}})
+
+    def test_open_full_and_unknown_nights(self):
+        got = collect.parse_recgov_month(self.MONTHS["2026-10"])
+        self.assertEqual(got["2026-10-05"], {"a": 1, "q": 2})        # two sites open
+        self.assertEqual(got["2026-10-06"], {"a": 0})                # every site taken
+        self.assertEqual(got["2026-10-07"], {"a": 0})                # the one bookable site is taken; walk-up sites do not count
+        self.assertIsNone(got["2026-10-08"])                         # not released for booking yet
+        self.assertIsNone(got["2026-10-09"])                         # walk-up only: cannot say
+        self.assertEqual(got["2026-10-10"], {"a": 0})                # closed for the season
+
+    def test_run_stops_asking_once_nothing_is_bookable(self):
+        sleeps = []
+        summary = collect.run(args(sources="recgov"), today=TODAY, sleep=sleeps.append, env={})
+        nights = self.out()["nights"]
+        self.assertEqual(nights["2026-10-05"]["camp"], {"a": 1, "q": 2, "t": "2026-10-05"})
+        self.assertEqual(nights["2026-10-06"]["camp"], {"a": 0, "t": "2026-10-05"})
+        self.assertNotIn("2026-10-08", nights)
+        self.assertEqual(len(self.calls), 3)                         # October, November, then December (not released): stop
+        self.assertEqual(sleeps, [10.0, 10.0, 10.0])                 # the pause recreation.gov asks for
+        self.assertTrue(summary["sources"]["recgov"]["ok"])
+
+    def test_a_night_that_drops_out_of_the_booking_window_is_cleared(self):
+        collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={})
+        self.MONTHS = {"2026-10": {"campsites": {"1": site(d05="NYR", d06="Reserved")}}}
+        collect.run(args(sources="recgov"), today=TODAY, sleep=lambda s: None, env={})
+        self.assertNotIn("2026-10-05", self.out()["nights"])
+
+    def test_props_flag_limits_the_run(self):
+        collect.run(args(sources="recgov", props="someone-else"), today=TODAY, sleep=lambda s: None, env={})
+        self.assertEqual(self.calls, [])
 
 
 class EnvFile(unittest.TestCase):
@@ -473,6 +557,8 @@ class RealPropertyFile(unittest.TestCase):
                 self.assertTrue(live["match"], p["id"])
             if live["source"] == "trmf":
                 self.assertIsInstance(live["hotel_id"], int)
+            if live["source"] == "recgov":
+                self.assertIsInstance(live["facility"], int)
         airbnb_ids = [i for p in props if (p.get("live") or {}).get("source") == "airbnb" for i in p["live"]["listings"]]
         self.assertEqual(len(airbnb_ids), len(set(airbnb_ids)), "an Airbnb listing is assigned to two properties")
 

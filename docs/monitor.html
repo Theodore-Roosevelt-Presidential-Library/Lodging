@@ -127,7 +127,8 @@
     var srcBox=document.getElementById('sources');
     Object.keys(data.sources||{}).forEach(function(s){var v=data.sources[s];
       var skipped=String(v.note||'').indexOf('skipped')===0;
-      srcBox.appendChild(el('span',s+': '+(v.ok?'ok':(skipped?'not set up':'problem'))+(v.note&&!skipped?' ('+v.note+')':''),(v.ok||skipped)?'':'bad'));});
+      var when=v.at?', last run '+fmt(v.at,{month:'short',day:'numeric'}):'';
+      srcBox.appendChild(el('span',s+': '+(v.ok?'ok':(skipped?'not set up':'problem'))+when+(v.note&&!skipped?' ('+v.note+')':''),(v.ok||skipped)?'':'bad'));});
     var jump=document.getElementById('jump'), weBox=document.getElementById('we');
 
     function draw(){
@@ -148,7 +149,7 @@
             td.className='open';
             text=rec.u?(rec.u.match(/1/g)||[]).length+' of '+(rec.of||rec.u.length):'Open';
             tip+=': '+(rec.u?text+' open':'open')+', checked '+rec.t;
-          } else {td.className='full'; text='Full'; tip+=': full or closed, checked '+rec.t;}
+          } else {td.className='full'; text=rec.u?'0 of '+(rec.of||rec.u.length):'Full'; tip+=': full or closed, checked '+rec.t;}
           var a=link(text,finder(n,p),tip);
           if(rec&&rec.a===1&&rec.q&&rec.q<=3) a.appendChild(el('small',rec.q+' left'));
           td.appendChild(a); tr.appendChild(td);

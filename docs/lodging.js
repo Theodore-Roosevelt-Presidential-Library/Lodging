@@ -90,6 +90,9 @@
   var SANS = 'Frutiger,"Frutiger Next","Helvetica Neue",Arial,sans-serif';
   var SERIF = 'Clearface,Georgia,"Times New Roman",serif';
 
+  // The arrow on the nights menu, drawn here so the menu looks the same in every browser.
+  var CHEVRON = "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231B4633' stroke-width='2'/%3E%3C/svg%3E\")";
+
   var CSS = [
     ':host{display:block;font-family:' + SANS + ';color:#25282A;line-height:1.4;--green:#1B4633;--accent:#E7805D;--accent-dark:#D07556;--line:#D8D5CC;--muted:#5A5F61;--wash:#F6F4EE;--bg:#fff;--top:0px}',
     '*{box-sizing:border-box}',
@@ -99,13 +102,19 @@
     '.count{font-weight:400;font-size:.86rem;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:.6em}',
     '.intro{font-family:' + SERIF + ';font-size:1.1rem;margin:0 0 1em;max-width:46em}',
     '.controls{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-end;background:var(--wash);border:1px solid var(--line);border-radius:2px;padding:16px}',
-    '.field{display:flex;flex-direction:column;gap:4px}',
-    'label,.legend{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green)}',
-    'input,select{font:inherit;color:inherit;background:#fff;border:1px solid #9A9C9A;border-radius:2px;padding:9px 10px;min-height:44px}',
+    '.field{display:flex;flex-direction:column;gap:6px;min-width:0}',
+    'label,.legend{display:block;font-size:.78rem;line-height:1;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green)}',
+    /* Every control is the same 44px box, with the browser's own styling switched off, so the row lines up everywhere. */
+    'input,select{-webkit-appearance:none;-moz-appearance:none;appearance:none;display:block;box-sizing:border-box;height:44px;margin:0;padding:0 12px;font:inherit;font-size:1rem;line-height:normal;color:#25282A;background-color:#fff;border:1px solid #9A9C9A;border-radius:2px}',
+    'input[type=date]{min-width:9.6em}',
+    'input::-webkit-date-and-time-value{text-align:left;line-height:42px}',
+    'input::-webkit-datetime-edit{padding:0;line-height:42px}',
+    'select{padding-right:38px;cursor:pointer;background-image:' + CHEVRON + ';background-repeat:no-repeat;background-position:right 13px center;background-size:12px 8px}',
+    'input:hover,select:hover,.chip:hover{border-color:#25282A}',
     'input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--green);outline-offset:2px}',
     '.chips{display:flex;flex-wrap:wrap;gap:6px}',
-    '.chip{font:inherit;font-size:.92rem;cursor:pointer;background:#fff;color:inherit;border:1px solid #9A9C9A;border-radius:2px;padding:9px 12px;min-height:44px}',
-    '.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}',
+    '.chip{-webkit-appearance:none;appearance:none;box-sizing:border-box;height:44px;margin:0;padding:0 14px;font:inherit;font-size:1rem;line-height:normal;cursor:pointer;background:#fff;color:#25282A;border:1px solid #9A9C9A;border-radius:2px}',
+    '.chip[aria-pressed="true"],.chip[aria-pressed="true"]:hover{background:var(--green);border-color:var(--green);color:#fff}',
     /* the pinned tab bar */
     '.bar{position:sticky;top:var(--top);z-index:5;display:flex;align-items:flex-end;justify-content:space-between;gap:8px 20px;margin-top:14px;background:var(--bg);border-bottom:1px solid var(--line)}',
     '.bar.stuck{box-shadow:0 6px 8px -6px rgba(37,40,42,.25)}',
@@ -230,7 +239,7 @@
       var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
       if (!rec || !rec.t || daysBetween(rec.t, now) > STALE_DAYS) return { status: 'unknown' };
       if (!oldest || rec.t < oldest) oldest = rec.t;
-      if (rec.a !== 1) return { status: 'unavailable', checked: oldest };
+      if (rec.a !== 1) return { status: 'unavailable', checked: oldest, of: rec.u ? (rec.of || rec.u.length) : null };
       if (rec.u) {
         // One character per cabin or rental. A unit counts only if it is open every night of the stay.
         grouped = true;
@@ -240,7 +249,7 @@
     }
     if (grouped) {
       var count = (mask.match(/1/g) || []).length;
-      if (!count) return { status: 'unavailable', checked: oldest };
+      if (!count) return { status: 'unavailable', checked: oldest, of: of };
       return { status: 'available', checked: oldest, count: count, of: of };
     }
     return { status: 'available', checked: oldest };
@@ -256,6 +265,46 @@
       if (!oldest || rec.t < oldest) oldest = rec.t;
     }
     return { mask: mask, checked: oldest };
+  }
+
+  function nameKey(name) { return String(name).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+
+  // A property whose cabins are listed on Airbnb or Vrbo can take its availability from those listings
+  // ("units_from" in the property list). A cabin listed on both sites under one name counts once.
+  function borrowed(p, checkin, nights) {
+    var seen = {}, checked = null;
+    Object.keys(p.units_from || {}).forEach(function (gid) {
+      var units = DATA.units && DATA.units[gid], group = BY_ID[gid];
+      var um = units && group ? unitMask(group, units, DATA, checkin, nights) : null;
+      if (!um) return;
+      p.units_from[gid].forEach(function (id) {
+        var i = 0;
+        while (i < units.length && String(units[i].id) !== String(id)) i++;
+        if (i === units.length) return;
+        var extra = LISTINGS[units[i].src + ':' + units[i].id] || {};
+        var key = nameKey(units[i].name || extra.name || gid + ' ' + id);
+        seen[key] = seen[key] || um.mask[i] === '1';
+        if (!checked || um.checked < checked) checked = um.checked;
+      });
+    });
+    var keys = Object.keys(seen);
+    return keys.length ? { open: keys.filter(function (k) { return seen[k]; }).length, total: keys.length, checked: checked } : null;
+  }
+
+  // Availability for one property card, counting any borrowed listings. When only some of a property's
+  // units are tracked and those are all booked, the answer is "check directly", not "full".
+  function status(p, checkin) {
+    var ev = evaluate(p, DATA, checkin, state.nights);
+    var b = p.units_from ? borrowed(p, checkin, state.nights) : null;
+    if (b) {
+      var known = ev.status === 'available' || ev.status === 'unavailable';
+      var open = (ev.status === 'available' ? ev.count || 0 : 0) + b.open;
+      var total = (known ? ev.of || 0 : 0) + b.total;
+      var checked = known && ev.checked && ev.checked < b.checked ? ev.checked : b.checked;
+      ev = open ? { status: 'available', checked: checked, count: open, of: total } : { status: 'unavailable', checked: checked, of: total };
+    }
+    if (ev.status === 'unavailable' && ev.of && p.units && ev.of < p.units) return { status: 'unknown' };
+    return ev;
   }
 
   // ---------- cards ----------
@@ -287,7 +336,7 @@
       history.replaceState(null, '', location.pathname + '?' + q.toString() + location.hash);
     } catch (e) { /* the address is a convenience; the finder works without it */ }
   }
-  var DATA = null, PHOTOS = {}, LISTINGS = {};
+  var DATA = null, PHOTOS = {}, LISTINGS = {}, BY_ID = {};
 
   function matchesType(p) {
     if (state.type === 'all') return true;
@@ -323,9 +372,9 @@
       c.quiet = true;
     } else {
       c.section = 'check';
-      c.headline = link ? 'Check dates directly' : 'Call to check dates';
+      c.headline = p.first_come ? 'First come, first served' : (link ? 'Check dates directly' : 'Call to check dates');
       c.fine = p.season || '';
-      label = p.type === 'rentals' ? 'See rentals' : (p.dated_url ? 'Check dates' : 'Website');
+      label = p.type === 'rentals' ? 'See rentals' : (p.dated_url && !p.first_come ? 'Check dates' : 'Website');
     }
     if (link) {
       c.actions.push({ href: link, label: label, aria: label + ': ' + p.name + ' (opens in a new tab)' });
@@ -340,7 +389,7 @@
     var site = SITE[unit.src] || 'the listing site';
     var c = { id: p.id + ':' + unit.id, prop: p.id, type: 'rentals', name: unit.name, meta: 'Vacation rental · Listed on ' + site, blurb: unit.summary || unit.facts,
       photo: unit.photo, fine: cap(checkedText(checked)), actions: [], site: site, sites: [site], isOpen: open,
-      twin: unit.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() };
+      twin: nameKey(unit.name) };
     c.section = open ? 'open' : 'closed';
     c.headline = open ? 'Available' : 'Booked on these dates';
     c.quiet = !open;
@@ -362,7 +411,7 @@
   function buildCards(p, checkin, checkout, trolley) {
     var units = p.list_units && DATA.units && DATA.units[p.id];
     var um = units && units.length ? unitMask(p, units, DATA, checkin, state.nights) : null;
-    if (!um) return [propCard(p, evaluate(p, DATA, checkin, state.nights), checkin, checkout, trolley)];
+    if (!um) return [propCard(p, status(p, checkin), checkin, checkout, trolley)];
     var out = [], shown = 0, extraOpen = 0;
     units.forEach(function (raw, i) {
       var extra = LISTINGS[raw.src + ':' + raw.id] || {};
@@ -623,6 +672,7 @@
   ]).then(function (res) {
     DATA = res[0];
     DATA.nights = DATA.nights || {};
+    DATA.properties.forEach(function (p) { BY_ID[p.id] = p; });
     PHOTOS = (res[1] && res[1].photos) || {};
     LISTINGS = (res[1] && res[1].listings) || {};
     wrap.removeChild(loading);

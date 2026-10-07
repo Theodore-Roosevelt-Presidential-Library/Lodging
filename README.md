@@ -98,7 +98,8 @@ Sources are switched on with `LODGING_SOURCES` (comma-separated) and read their 
 | Key | Covers | Needs | Status |
 |---|---|---|---|
 | `trmf` | Hotel 1883, Rough Riders Hotel and inns, Badlands Motel, Elkhorn Quarters, Medora Campground | Nothing | Tested live Oct 5. Goes against the booking site's robots.txt; see PLAN.md. |
-| `google_hotels` | 16 Dickinson hotels, AmericInn Medora, Trapper's Inn | `SEARCHAPI_KEY` | Tested live Oct 5; all 18 hotels matched. Needs SearchApi's $40 plan to run daily. |
+| `google_hotels` | 16 Dickinson hotels, AmericInn Medora, Trapper's Inn | `SEARCHAPI_KEY` | Tested live Oct 5; all 18 hotels matched. Runs on SearchApi's $40 plan (10,000 searches a month). |
+| `recgov` | Cottonwood Campground, Roundup Group Horse Camp, Buffalo Gap Campground | Nothing | Tested live Oct 7. Uses recreation.gov's own availability lookup, which its robots.txt disallows; see PLAN.md. |
 | `airbnb` | 15 known Airbnb listings around Medora, shown as one count; plus the Vacation Medora cabins that are on Airbnb (2 at Boots, 6 at The Crossings) | `APIFY_TOKEN` | Tested live Oct 5 |
 | `guesty` | Nothing today. Kept for any operator who shares Guesty Booking Engine API credentials | `GUESTY_CLIENT_ID`, `GUESTY_CLIENT_SECRET` | Written from Guesty's documentation; unused |
 | `vrbo` | Vrbo listings in a map area around Medora, shown as one count | `APIFY_TOKEN` | Tested live Oct 5 |
@@ -106,10 +107,18 @@ Sources are switched on with `LODGING_SOURCES` (comma-separated) and read their 
 How each reads availability:
 
 - **trmf**: one request per property per night. A daily run checks the next 45 nights and one-seventh of the nights beyond, out to 330.
-- **google_hotels**: one search per town per night (two pages for Dickinson). A hotel showing a rate is "open"; a hotel with no rate, or missing from the results, is "unknown", never "full". Checks the next 21 nights daily and one-seventh of the rest, out to 120 nights: about 100 to 150 searches a day.
+- **google_hotels**: one search per town per night (two pages for Dickinson). A hotel showing a rate is "open"; a hotel with no rate, or missing from the results, is "unknown", never "full". Checks the next 30 nights daily and one-seventh of the rest, out to 240 nights (Google stops answering somewhere past 250): about 240 searches a day, 7,200 a month.
+- **recgov**: one request per campground per month, ten seconds apart. A night is open when at least one site is "Available", full when every bookable site is taken or closed, and unknown when booking has not opened yet (recreation.gov releases dates about six months ahead) or the campground is in its walk-up season.
 - **guesty**, **airbnb**, **vrbo**: read each listing's calendar for the whole horizon in one pass per day. The widget counts a cabin or rental only if it is open every night of the stay.
 
 Rates returned by these services are discarded; nothing price-related is written to `docs/data/`.
+
+Two more ways a card gets a real answer instead of "Check dates directly":
+
+- `"units_from"` in `data/properties.json` lets a property take its availability from named Airbnb or Vrbo listings tracked under the rental entries, for example Dakota Place Lodge from its five Vrbo suites. A cabin listed on both sites under one name counts once. When only some of a property's units are tracked and those are all booked, the card says "Check dates directly" rather than "Full".
+- `"first_come": true` marks a campground that takes no reservations. Its card says "First come, first served".
+
+A second run on the same day skips nights already checked that day, so a long first fill can be done in pieces with `--limit`. `--props id,id` limits a run to named properties.
 
 ## Photos
 

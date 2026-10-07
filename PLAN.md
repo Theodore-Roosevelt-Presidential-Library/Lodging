@@ -34,7 +34,8 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 | Collector: Airbnb and Vrbo (`airbnb`, `vrbo`) | Tested live Oct 5; full 330-night calendars |
 | Vacation Medora cabins | Read from their Airbnb calendars (see below); the `guesty` collector is kept but unused |
 | Photos (`collector/photos.py`) | Done; see "Photos" below |
-| Offline tests | 54 pass; they use canned responses shaped like each service's documentation |
+| Collector: recreation.gov campgrounds (`recgov`) | Tested live Oct 7; three campgrounds |
+| Offline tests | 61 pass; they use canned responses shaped like each service's documentation |
 | Daily workflow | Written; `.github/workflows/collect.yml` is not in the repository yet, so nothing refreshes on its own |
 | Pages site | Live at lodging.labs.trlibrary.com |
 
@@ -70,7 +71,23 @@ Option not built: a weekly Airbnb search that proposes new listing IDs for revie
 
 ## SearchApi plan
 
-The free tier is 100 searches, once (about 45 used by Oct 7, in testing and photo lookups). Daily use is about 140 searches (about 4,200 a month), so running `google_hotels` daily needs the Developer plan, $40 a month for 10,000 searches, the smallest paid tier. Without it, leave `google_hotels` out of `LODGING_SOURCES`: the 16 Dickinson hotels, AmericInn Medora and Trapper's Inn then appear under "check directly," and hotel photos from Google are not refreshed.
+Upgraded Oct 7 to the Developer plan: $40 a month, 10,000 searches. The Google Hotels window was widened to use it: the next 30 nights daily and the rest weekly, out to 240 nights, about 7,200 searches a month.
+
+Google Hotels shows rates for AmericInn Medora, Trapper's Inn and the Dickinson hotels only. The other Medora-area inns, ranches and campgrounds are listed there without rates, so the paid plan cannot make them live.
+
+## Getting more live answers (Oct 7)
+
+What decides whether a card says "Open", "Full" or "Check dates directly":
+
+1. Whether the daily refresh runs. Until `.github/workflows/collect.yml` is in the repository, the only data is from hand runs. On Oct 7 the folder was filled by hand: Medora Foundation properties through Nov 16, Google Hotels through Nov 6, Airbnb and Vrbo for 330 nights, recreation.gov for six months. Anything older than ten days is shown as "check directly".
+2. Whether the property has a source. Of 50 property cards, 30 can now show a live answer: 5 Medora Foundation, 18 through Google Hotels, 3 on recreation.gov, 2 Vacation Medora cabin groups, and 2 (Dakota Place Lodge, King's Guest Ranch) through their own Airbnb and Vrbo listings. All 27 rental listings are live.
+3. The other 20 have nothing to read: two Forest Service campgrounds are first come, first served (and now say so); the rest take bookings by phone, by their own website, or through the state park system, which blocks automated checks.
+
+## recreation.gov
+
+Cottonwood Campground (251160), Roundup Group Horse Camp (251161) and Buffalo Gap Campground (246796) are booked through recreation.gov. Its official data service (RIDB) does not include availability, so the `recgov` source reads the same month-by-month lookup the site's own pages use. That lookup sits under `/api`, which the site's `robots.txt` disallows, with a requested ten-second pause between requests. The source keeps that pause and makes about 30 requests a day. Matt asked for this source on Oct 7; it runs only when `recgov` is in `LODGING_SOURCES`.
+
+Nights more than about six months out are not released for booking and show as "check directly". Buffalo Gap shows nothing until its season is released.
 
 ## The Medora Foundation source
 
@@ -106,7 +123,7 @@ Guesty credentials are not obtainable, so these cabins are read from their Airbn
 
 Reading the operator's own booking site (vacationmedora.guestybookings.com) was tried and dropped. Its robots.txt allows crawling, but the data behind it comes from Guesty's servers, which return empty responses to anything that is not a full browser. Getting past that would mean imitating a browser to defeat Guesty's filtering, which this project does not do.
 
-Not planned: recreation.gov and ND Parks (both disallow or block automated checks); Campspot (needs a headless browser); phone-only properties.
+Not planned: ND Parks (blocks automated checks); Campspot (needs a headless browser); phone-only properties.
 
 ## Known limits
 

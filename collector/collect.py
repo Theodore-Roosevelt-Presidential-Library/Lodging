@@ -51,13 +51,21 @@ MAX_HORIZON = 330
 SETTINGS = {
     # horizon: nights ahead. near: nights refreshed every run. cycle: far nights refreshed once per this many runs.
     "trmf": {"horizon": 330, "near": 45, "cycle": 7, "delay": 1.0},
-    "google_hotels": {"horizon": 120, "near": 21, "cycle": 7, "delay": 0.5},
+    # About 60 nights a run, four searches each: roughly 7,200 searches a month, inside the 10,000 plan.
+    # Google Hotels stops answering somewhere past 250 nights out.
+    "google_hotels": {"horizon": 240, "near": 30, "cycle": 7, "delay": 0.5},
     # Calendar sources return every night in one pass, so they need no rotation.
     "guesty": {"horizon": 330, "delay": 0.3, "chunk_days": 90},
     "airbnb": {"horizon": 330},
     "vrbo": {"horizon": 330},
+    # One request per campground per month, ten seconds apart (the pause recreation.gov's robots file asks for).
+    "recgov": {"horizon": 330, "delay": 10.0},
 }
-SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo"]
+SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo", "recgov"]
+RECGOV_ENDPOINT = "https://www.recreation.gov/api/camps/availability/campground/{facility}/month?start_date={month}-01T00%3A00%3A00.000Z"
+RECGOV_OPEN = {"Available"}
+RECGOV_TAKEN = {"Reserved", "Not Available", "Not Available Cutoff", "Closed"}
+RECGOV_IGNORED = {"Not Reservable", "Not Reservable Management"}   # walk-up or staff sites: neither open nor full
 TIMEOUT_SECONDS = 30
 MAX_CONSECUTIVE_FAILURES = 8
 USER_AGENT = "TRPL-Lodging-Finder/1.0 (Theodore Roosevelt Presidential Library; https://www.trlibrary.com)"
@@ -173,6 +181,8 @@ class Run:
         cfg, seen, out = SETTINGS[source], self.checked.get(source, {}), []
         for offset, iso in enumerate(self.horizon(source)):
             ordinal = self.today.toordinal() + offset
+            if seen.get(iso) == self.stamp and not self.args.full:
+                continue   # already checked today, so a second run the same day picks up where the first stopped
             if (self.args.full or offset < cfg["near"] or iso not in seen
                     or ordinal % cfg["cycle"] == self.today.toordinal() % cfg["cycle"]):
                 out.append(iso)
@@ -289,6 +299,8 @@ def google_search(key: str, query: str, night: str, max_pages: int, run: Run) ->
         payload = http_json("GET", SEARCHAPI_ENDPOINT + "?" + urllib.parse.urlencode(params),
                             headers={"Authorization": f"Bearer {key}"}) or {}
         if payload.get("error"):
+            if "return any results" in str(payload["error"]):
+                break   # nothing listed for that town and night (or the night is past Google's range): not a failure
             raise HttpError(f"SearchApi error: {str(payload['error'])[:160]}")
         found.extend(payload.get("properties") or [])
         token = (payload.get("pagination") or {}).get("next_page_token")
@@ -637,8 +649,74 @@ def collect_vrbo(run: Run, props: list[dict]) -> None:
         run.mark("vrbo", night)
 
 
+# --------------------------------------------------------------------------- recreation.gov campgrounds
+
+def parse_recgov_month(payload) -> dict[str, dict | None]:
+    """Night -> record for one campground-month.
+
+    Open when at least one site is "Available" (q = how many). Full when every reservable site is taken.
+    Unknown (None) when the night has not been released for booking yet or has only walk-up sites.
+    """
+    by_night: dict[str, list[str]] = {}
+    for site in ((payload or {}).get("campsites") or {}).values():
+        for day, status in ((site or {}).get("availabilities") or {}).items():
+            by_night.setdefault(str(day)[:10], []).append(str(status))
+    out: dict[str, dict | None] = {}
+    for night, statuses in by_night.items():
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", night):
+            continue
+        open_sites = sum(1 for s in statuses if s in RECGOV_OPEN)
+        counted = [s for s in statuses if s not in RECGOV_IGNORED]
+        if open_sites:
+            out[night] = {"a": 1, "q": open_sites}
+        elif counted and all(s in RECGOV_TAKEN for s in counted):
+            out[night] = {"a": 0}
+        else:
+            out[night] = None
+    return out
+
+
+def recgov_unreleased(payload) -> bool:
+    """True when a month holds nothing but nights not yet released for booking."""
+    seen = {str(s) for site in ((payload or {}).get("campsites") or {}).values()
+            for s in ((site or {}).get("availabilities") or {}).values()} - RECGOV_IGNORED
+    return seen == {"NYR"}
+
+
+def recgov_months(run: Run) -> list[str]:
+    nights = run.horizon("recgov")
+    return sorted({n[:7] for n in nights})
+
+
+def collect_recgov(run: Run, props: list[dict]) -> None:
+    stat, cfg = run.stat("recgov"), SETTINGS["recgov"]
+    horizon, complete = set(run.horizon("recgov")), True
+    for prop in props:
+        facility = int(prop["live"]["facility"])
+        for month in recgov_months(run):
+            stat["requests"] += 1
+            try:
+                payload = http_json("GET", RECGOV_ENDPOINT.format(facility=facility, month=month))
+                nights = parse_recgov_month(payload)
+            except (HttpError, ValueError) as exc:
+                stat["failed"] += 1
+                complete = False
+                print(f"  recgov {prop['id']} {month}: {exc}", file=sys.stderr)
+                run.sleep(cfg["delay"])
+                continue
+            for night, rec in nights.items():
+                if night in horizon:
+                    run.put(night, prop["id"], rec)
+            run.sleep(cfg["delay"])
+            if month > run.stamp[:7] and recgov_unreleased(payload):
+                break   # booking has not opened this far out, so later months will say the same
+    if complete:
+        for night in run.horizon("recgov"):
+            run.mark("recgov", night)
+
+
 SOURCES = {"trmf": collect_trmf, "google_hotels": collect_google_hotels, "guesty": collect_guesty,
-           "airbnb": collect_airbnb, "vrbo": collect_vrbo}
+           "airbnb": collect_airbnb, "vrbo": collect_vrbo, "recgov": collect_recgov}
 
 
 # --------------------------------------------------------------------------- connection check
@@ -684,6 +762,11 @@ def check(run: Run, source: str, props: list[dict]) -> None:
         print(f"  {len(items)} item(s); fields on the first: {sorted(items[0])[:15] if items else []}")
         cal = parse_airbnb_items(items)
         print(f"  parsed calendars: {len(cal)}; days in the first: {len(next(iter(cal.values()))) if cal else 0}")
+    elif source == "recgov":
+        nights = parse_recgov_month(http_json("GET", RECGOV_ENDPOINT.format(facility=int(props[0]["live"]["facility"]), month=run.stamp[:7])))
+        known = [n for n, r in sorted(nights.items()) if r and n >= run.stamp]
+        print(f"  {props[0]['name']}: {len(nights)} nights this month, {sum(1 for r in nights.values() if r and r['a'])} with open sites"
+              + (f"; next open or full night {known[0]}" if known else ""))
     elif source == "vrbo":
         live = props[0]["live"]
         items = apify_run(APIFY_VRBO_ACTOR, {"startUrls": list(live.get("start", [])), "scrapeAvailability": True,
@@ -749,6 +832,9 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
     hints_before = json.dumps(state.photo_hints, sort_keys=True)
     for source in enabled:
         sprops = [p for p in props if (p.get("live") or {}).get("source") == source]
+        only = {x.strip() for x in (getattr(args, "props", "") or "").split(",") if x.strip()}
+        if only:
+            sprops = [p for p in sprops if p["id"] in only]
         if not sprops:
             continue
         stat = state.stat(source)
@@ -781,7 +867,9 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
         "horizon_nights": MAX_HORIZON,
         "basis": "Whether a stay for two adults could be booked when checked. Rates are not collected.",
         "sources_enabled": enabled,
-        "sources": {s: {"ok": v.get("ok", False), "note": v.get("note", "")} for s, v in state.stats.items()},
+        # Each source keeps its last result, so a run of one source does not wipe the others off the monitor.
+        "sources": {**{s: v for s, v in (previous.get("sources") or {}).items() if s in sources},
+                    **{s: {"ok": v.get("ok", False), "note": v.get("note", ""), "at": stamp} for s, v in state.stats.items()}},
         "trolley_months": catalog.get("trolley_months", []),
         "properties": [p for p in props if p.get("public", True)],
         "units": {pid: state.units[pid] for pid in sorted(state.units) if pid in listed},
@@ -813,6 +901,7 @@ def main(argv=None) -> int:
     ap.add_argument("--limit", type=int, default=0, help="cap nights per run for per-night sources (testing)")
     ap.add_argument("--sources", default=os.environ.get("LODGING_SOURCES", ""),
                     help="comma-separated sources to run (default: $LODGING_SOURCES)")
+    ap.add_argument("--props", default="", help="comma-separated property ids to limit the run to (testing)")
     args = ap.parse_args(argv)
     summary = run(args)
     ran = [v for v in summary["sources"].values() if "ok" in v and not str(v.get("note", "")).startswith("skipped")]
