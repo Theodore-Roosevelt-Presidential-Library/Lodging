@@ -159,6 +159,7 @@ class Run:
         self.env = os.environ if env is None else env
         self.changes: list[list] = []
         self.stats: dict[str, dict] = {}
+        self.units: dict[str, list[dict]] = {}   # property id -> its listings, in the order of the "u" characters
 
     def stat(self, source: str) -> dict:
         return self.stats.setdefault(source, {"requests": 0, "failed": 0, "note": ""})
@@ -526,6 +527,56 @@ def parse_vrbo_items(items: list[dict], exclude: set[str]) -> dict[str, dict[str
     return out
 
 
+def clean_title(text, limit: int = 80) -> str:
+    """A host-written listing title, tidied: one line, single spaces, not too long."""
+    text = re.sub(r"\s+", " ", str(text or "")).strip()
+    return text if len(text) <= limit else text[: limit - 1].rstrip(" ,.-") + "…"
+
+
+def rated_below(rating, scale, floor: float, reviews=None) -> bool:
+    """True when a listing's guest rating is known and under the floor (a fraction of the scale)."""
+    try:
+        rating, scale = float(rating), float(scale or 0)
+    except (TypeError, ValueError):
+        return False
+    if scale <= 0 or (reviews is not None and int(reviews or 0) < 3):
+        return False
+    return rating / scale < floor
+
+
+def parse_vrbo_details(items: list[dict], floor: float = 0.7) -> tuple[dict[str, dict], set[str]]:
+    """Name, link and first photo for each Vrbo listing, plus the IDs to leave out for a low guest rating.
+
+    Rates, ratings, host names and everything else the actor returns are discarded.
+    """
+    details, low = {}, set()
+    for item in items:
+        if item.get("kind") not in (None, "property"):
+            continue
+        vid = str(item.get("vrboId") or "")
+        if not vid:
+            continue
+        if rated_below(item.get("rating"), item.get("ratingScale") or 10, floor, item.get("reviewCount")):
+            low.add(vid)
+            continue
+        entry = {"id": vid, "src": "vrbo", "name": clean_title(item.get("title")),
+                 "url": str(item.get("listingUrl") or f"https://www.vrbo.com/{vid}")}
+        first = (item.get("photos") or [None])[0]
+        photo = first.get("url") if isinstance(first, dict) else first
+        if isinstance(photo, str) and photo.startswith("https://"):
+            entry["photo"] = photo.split("?")[0] + ("?impolicy=resizecrop&rw=640&ra=fit" if "media.vrbo.com/" in photo else "")
+        facts = []
+        for key, one, many in (("sleeps", "Sleeps {}", "Sleeps {}"), ("bedrooms", "{} bedroom", "{} bedrooms"),
+                               ("bathrooms", "{} bath", "{} baths")):
+            value = item.get(key)
+            if isinstance(value, (int, float)) and value > 0:
+                facts.append((one if value == 1 else many).format(int(value) if float(value).is_integer() else value))
+        if facts:
+            entry["facts"] = " · ".join(facts)
+        details[vid] = entry
+    return details, low
+
+
 def apify_token(run: Run) -> str:
     token = run.env.get("APIFY_TOKEN")
     if not token:
@@ -537,6 +588,7 @@ def collect_airbnb(run: Run, props: list[dict]) -> None:
     """One actor run covers every listing ID across all Airbnb-sourced properties."""
     token, stat = apify_token(run), run.stat("airbnb")
     wanted = {p["id"]: [str(i) for i in p["live"].get("listings", [])] for p in props}
+    props_by_id = {p["id"]: p for p in props}
     all_ids = sorted({i for ids in wanted.values() for i in ids})
     if not all_ids:
         return
@@ -551,7 +603,11 @@ def collect_airbnb(run: Run, props: list[dict]) -> None:
             continue
         if len(got) < len(ids):
             notes.append(f"{pid}: {len(ids) - len(got)} of {len(ids)} listings returned no calendar")
+        hidden = {str(x) for x in props_by_id[pid]["live"].get("hide", [])}
+        ids = [i for i in ids if i not in hidden]
         run.put_units(pid, ids, got, "airbnb")
+        if props_by_id[pid].get("list_units"):
+            run.units[pid] = [{"id": i, "src": "airbnb", "url": f"https://www.airbnb.com/rooms/{i}"} for i in ids]
     stat["note"] = "; ".join(notes)
     for night in run.horizon("airbnb"):
         run.mark("airbnb", night)
@@ -563,12 +619,20 @@ def collect_vrbo(run: Run, props: list[dict]) -> None:
         live = prop["live"]
         actor_input = {"startUrls": list(live.get("start", [])), "scrapeAvailability": True, "includeReviews": False,
                        "adultsCount": 2, "maxItems": int(live.get("max_items", 60))}
-        calendars = parse_vrbo_items(apify_run(APIFY_VRBO_ACTOR, actor_input, token, run, "vrbo"),
-                                     {str(x) for x in live.get("exclude", [])})
+        items = apify_run(APIFY_VRBO_ACTOR, actor_input, token, run, "vrbo")
+        details, low = parse_vrbo_details(items, float(live.get("min_rating", 0.7)))
+        skip = {str(x) for x in live.get("exclude", [])} | {str(x) for x in live.get("hide", [])} | low
+        calendars = parse_vrbo_items(items, skip)
         if not calendars:
             stat["note"] = f"{prop['id']}: the actor returned no calendars"
             continue
-        run.put_units(prop["id"], sorted(calendars), calendars, "vrbo")
+        ids = sorted(calendars)
+        run.put_units(prop["id"], ids, calendars, "vrbo")
+        if prop.get("list_units"):
+            run.units[prop["id"]] = [details.get(vid) or {"id": vid, "src": "vrbo", "url": f"https://www.vrbo.com/{vid}"}
+                                     for vid in ids]
+        if low:
+            stat["note"] = f"{prop['id']}: {len(low)} left out for a low guest rating"
     for night in run.horizon("vrbo"):
         run.mark("vrbo", night)
 
@@ -670,6 +734,8 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
             del recs[pid]
 
     state = Run(today, args, nights, checked, sleep=sleep, env=env)
+    listed = {p["id"] for p in props if p.get("live") and p.get("list_units") and p.get("public", True)}
+    state.units = {pid: units for pid, units in (previous.get("units") or {}).items() if pid in listed}
     # Google Hotels results carry a photo; note one for each tracked hotel and for any property that asks
     # for it with "photo_match". photos.py uses these only when a property's own site offers no image.
     state.photo_targets = {}
@@ -718,6 +784,7 @@ def run(args, sources=None, today: dt.date | None = None, sleep=time.sleep, env=
         "sources": {s: {"ok": v.get("ok", False), "note": v.get("note", "")} for s, v in state.stats.items()},
         "trolley_months": catalog.get("trolley_months", []),
         "properties": [p for p in props if p.get("public", True)],
+        "units": {pid: state.units[pid] for pid in sorted(state.units) if pid in listed},
         "nights": {n: nights[n] for n in sorted(nights) if nights[n]},
         "checked": {s: dict(sorted(v.items())) for s, v in checked.items() if v},
     }

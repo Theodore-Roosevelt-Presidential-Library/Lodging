@@ -360,6 +360,61 @@ class Apify(Sandbox):
         collect.run(args(sources="vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
         self.assertEqual(self.out()["nights"]["2026-10-05"]["vrbo"], {"a": 1, "u": "01", "of": 2, "t": "2026-10-05"})
 
+    def listed(self, **live):
+        props = json.loads(collect.PROPERTIES.read_text())
+        for p in props["properties"]:
+            p["list_units"] = True
+            p["live"].update(live.get(p["id"], {}))
+        collect.PROPERTIES.write_text(json.dumps(props))
+
+    def test_grouped_properties_write_no_listing_details(self):
+        collect.run(args(sources="airbnb,vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        self.assertEqual(self.out()["units"], {})
+
+    def test_airbnb_listings_are_named_in_bit_order(self):
+        self.listed(airbnb={"hide": ["222"]})
+        collect.run(args(sources="airbnb"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        out = self.out()
+        self.assertEqual(out["units"]["airbnb"], [{"id": "111", "src": "airbnb", "url": "https://www.airbnb.com/rooms/111"},
+                                                  {"id": "333", "src": "airbnb", "url": "https://www.airbnb.com/rooms/333"}])
+        self.assertEqual(out["nights"]["2026-10-05"]["airbnb"], {"a": 1, "u": "10", "of": 2, "t": "2026-10-05"})
+
+    def test_vrbo_listings_carry_name_link_and_photo_only(self):
+        self.listed()
+        items = [
+            {"kind": "property", "vrboId": "v2", "title": "  Badlands   Bunkhouse ", "listingUrl": "https://www.vrbo.com/v2",
+             "photos": [{"url": "https://media.vrbo.com/lodging/1/a.jpg?old=1", "caption": "Room"}, {"url": "https://media.vrbo.com/lodging/1/b.jpg"}],
+             "sleeps": 6, "bedrooms": 2, "bathrooms": 1.5, "rating": 9.4, "ratingScale": 10, "reviewCount": 31,
+             "host": {"name": "STEPHANIE"}, "adr": 123.83, "rates": {"nightlyRate": 211},
+             "calendar": [{"date": "2026-10-05", "available": True, "pricePerNight": 300}]},
+            {"kind": "property", "vrboId": "v1", "title": "Plain House", "calendar": [{"date": "2026-10-05", "available": False}]},
+            {"kind": "property", "vrboId": "v0", "title": "Rough Place", "rating": 2.8, "ratingScale": 10, "reviewCount": 3,
+             "calendar": [{"date": "2026-10-05", "available": True}]},
+            {"kind": "property", "vrboId": "v9", "title": "One Bad Review", "rating": 2.0, "ratingScale": 10, "reviewCount": 1,
+             "calendar": [{"date": "2026-10-05", "available": True}]},
+        ]
+        original = self.respond
+        self.respond = lambda method, url, *a: items if "/datasets/dsV/items" in url else original(method, url, *a)
+        summary = collect.run(args(sources="vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        out, text = self.out(), collect.OUT.read_text()
+        self.assertEqual([u["id"] for u in out["units"]["vrbo"]], ["v1", "v2", "v9"])      # v0 left out: low rating, 3 reviews
+        self.assertEqual(out["nights"]["2026-10-05"]["vrbo"]["u"], "011")
+        self.assertEqual(out["units"]["vrbo"][1], {
+            "id": "v2", "src": "vrbo", "name": "Badlands Bunkhouse", "url": "https://www.vrbo.com/v2",
+            "photo": "https://media.vrbo.com/lodging/1/a.jpg?impolicy=resizecrop&rw=640&ra=fit",
+            "facts": "Sleeps 6 · 2 bedrooms · 1.5 baths"})
+        for private in ("STEPHANIE", "123.83", "211", "300", "9.4", "2.8"):
+            self.assertNotIn(private, text)
+        self.assertIn("1 left out for a low guest rating", summary["sources"]["vrbo"]["note"])
+
+    def test_listing_details_survive_a_run_of_another_source(self):
+        self.listed()
+        collect.run(args(sources="vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        before = self.out()["units"]["vrbo"]
+        collect.run(args(sources="airbnb"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})
+        self.assertEqual(self.out()["units"]["vrbo"], before)
+        self.assertIn("airbnb", self.out()["units"])
+
     def test_failed_run_writes_nothing_and_reports(self):
         self.status = "FAILED"
         summary = collect.run(args(sources="airbnb,vrbo"), today=TODAY, sleep=lambda s: None, env={"APIFY_TOKEN": "TOKEN"})

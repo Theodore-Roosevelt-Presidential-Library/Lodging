@@ -17,15 +17,38 @@ Optional attributes on the script tag:
 | `data-target="#id"` | Mounts in a different element |
 | `data-area="medora"` | Shows only Medora-area lodging (`medora`, `nearby` or `dickinson`) |
 | `data-photos="off"` | Never shows photos |
-| `data-photos="all"` | Also shows small photos in the "check directly" lists (off by default because too few properties have one) |
+| `data-fonts="off"` | Does not load the brand fonts |
+| `data-sticky-top="94"` | Pixels to leave above the pinned tab bar. By default the widget measures the page's own fixed header and sits just below it |
 
-The widget renders in a shadow root, so page styles do not leak in or out. It inherits the page's body font and uses the site's heading faces when they are loaded.
+The widget renders in a shadow root, so page styles do not leak in or out.
+
+Fonts are the brand faces trlibrary.com uses: Dharma Gothic E for the heading, Clearface for names and descriptions, Frutiger for labels, tabs and buttons. On trlibrary.com the page already has them. Anywhere else (including lodging.labs) the widget loads the five font files from `www.trlibrary.com/themes/custom/trpl/css/`, which serves them to any site. No font files are stored in this repository.
 
 ## What visitors see
 
-- **Open for your dates**: properties with a live source, when every night of the stay had a room or site at the last check. Each is a card: photo when one is known, name, where it is, "Rooms available" and when that was checked, one Book button that opens the property's booking site on those dates, and the phone number as a plain link beside it. Cabins and rentals show a count ("3 units available", "9 rentals available"). Open Dickinson hotels sit in their own fold. No rates are shown.
-- **Places to check directly**: everything else, grouped by area, one line each: name, where it is, season, and a single button (dated link, website or phone).
-- **Full or closed on these dates**: live properties with no availability.
+Every place is a card: photo, name, where it is, a one-line description, a status, one button, and the phone number as a plain link.
+
+A tab bar splits the cards into four groups, and only one group shows at a time: **Medora**, **Vacation rentals**, **Nearby towns** and **Dickinson**. Each tab shows how many places are open for the chosen dates. The bar stays pinned under the site header while the visitor scrolls, and switching tabs brings the top of the new group into view. Arrow keys move between tabs.
+
+Inside a tab the cards are grouped by status:
+
+- **Open for your dates**: every night of the stay had a room or site at the last check. The button opens the booking site on those dates. No rates are shown.
+- **Check directly**: availability is not tracked, or the last check is more than ten days old. The button is a dated link where the booking site supports one, the website, or the phone number.
+- **Full or closed on these dates**: checked, and nothing available.
+
+### Vacation rentals
+
+Each Airbnb and Vrbo listing gets its own card with its photo, the host's title and a "View on Airbnb" or "View on Vrbo" button that opens that listing on the chosen dates. A listing that appears on both sites under the same name becomes one card with a button for each. Two cards at the end link to the full Airbnb and Vrbo searches.
+
+Controls in `data/properties.json`:
+
+| Setting | Effect |
+|---|---|
+| `"list_units": true` | Shows each listing as its own card. Remove it to go back to one card with a count |
+| `live.hide` | Listing IDs never to show |
+| `live.min_rating` | Listings whose guest rating is under this share of the scale are left out (default `0.7`: under 7 of 10 on Vrbo with at least three reviews, under 3.5 stars on Airbnb). Ratings are used only for this and are not stored or shown |
+| `live.listings` (Airbnb) | The Airbnb listing IDs to track. This list is kept by hand: a new Airbnb listing does not appear until its ID is added |
+| `live.start` (Vrbo) | The map area searched on every run. New Vrbo listings inside it appear on their own |
 
 The free Medora trolley is seasonal. `trolley_months` in `data/properties.json` lists the months it runs (June through September, per trlibrary.com/visit/trolley). A property marked `"trolley": true` gets "Free summer trolley stop" only when every night of the stay falls in those months. Change the list if the season changes; an empty list removes the mention.
 
@@ -71,13 +94,18 @@ Rates returned by these services are discarded; nothing price-related is written
 
 `collector/photos.py` records where a photo of each property lives; the widget then shows it straight from that address. No image is copied into this repository.
 
-For each public property it tries, in order:
+Every public property has a photo as of October 2026. For each one the step tries, in order:
 
 1. `"photo"` in `data/properties.json`: an address set by hand, for example a Library photograph. `"photo": false` means never show one.
-2. The link-preview image the property's own website publishes (the picture that appears when the page is shared). Logos, placeholders, very small or oddly shaped images, and any image that several properties share are passed over.
-3. The photo Google Hotels shows for the property, noted by the collector during a `google_hotels` run. This covers tracked hotels and any property with `"photo_match"`. These can be guest photos rather than the hotel's own; run with `--no-google` to leave them out.
+2. The link-preview image the property's own website publishes (the picture that appears when the page is shared). Logos, placeholders, small or oddly shaped images, and any image that several properties share are passed over.
+3. The first large landscape image in the body of the property's own page.
+4. The photo Google Hotels shows for the property, noted by the collector during a `google_hotels` run. This covers tracked hotels and any property with `"photo_match"`.
+5. For cabins read from Airbnb calendars, the photo of their first Airbnb listing.
+6. The photo Google Maps shows for the search named in `"photo_search"`. This costs one SearchApi search, and only when no photo is on file or the old one has stopped loading.
 
-Each website is looked at about once a week. Airbnb and Vrbo cards have no photo. Photos appear on the "open for your dates" cards; the "check directly" lists stay text-only unless the embed sets `data-photos="all"`.
+Airbnb listing cards take their title and photo from each listing page's link preview. Vrbo listing cards take theirs from the same Apify run that reads the calendars.
+
+Google's photos (steps 4 and 6) can be guest-contributed rather than the property's own; `python collector/photos.py --no-google` leaves them out. Each website is looked at about once a week. A card with no photo, or whose photo stops loading, shows a plain panel with a small icon.
 
 ```bash
 python collector/photos.py                    # weekly refresh (what the workflow runs)
@@ -89,7 +117,7 @@ python collector/photos.py --only hotel-1883  # one property
 
 Locally, copy `.env.example` to `.env` and fill it in. `.env` is ignored by git.
 
-On GitHub: Settings → Secrets and variables → Actions. `LODGING_SOURCES` is a Variable; `SEARCHAPI_KEY` and `APIFY_TOKEN` are Secrets.
+On GitHub: Settings → Secrets and variables → Actions. `LODGING_SOURCES` is a Variable; `SEARCHAPI_KEY` and `APIFY_TOKEN` are Secrets. The photo step also reads `SEARCHAPI_KEY`, for the Google Maps fallback only.
 
 After adding a key, confirm it before the first real run:
 

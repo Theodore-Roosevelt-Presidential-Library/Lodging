@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text.",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
   "trolley_months": [6, 7, 8, 9],
   "trolley_note": "Months when the free Medora trolley runs (trlibrary.com/visit/trolley: June through September). The widget mentions the trolley only for stays that fall entirely inside these months.",
   "properties": [
@@ -145,6 +145,8 @@
     },
     {
       "id": "amble-inn",
+      "photo_match": "amble inn",
+      "photo_search": "Amble Inn, Medora, ND",
       "name": "Amble Inn",
       "type": "hotel",
       "town": "Medora",
@@ -175,6 +177,8 @@
     },
     {
       "id": "custers-cottage",
+      "photo_match": "custer's cottage",
+      "photo_search": "Custer's Cottage, Medora, ND",
       "name": "Custer's Cottage and Wooly Wagons",
       "type": "cabin",
       "town": "Medora",
@@ -214,6 +218,8 @@
     },
     {
       "id": "buffalo-gap-guest-ranch",
+      "photo_match": "buffalo gap guest ranch",
+      "photo_search": "Buffalo Gap Guest Ranch, Medora, ND",
       "name": "Buffalo Gap Guest Ranch",
       "type": "cabin",
       "town": "West of Medora",
@@ -230,6 +236,8 @@
     },
     {
       "id": "bar-x-guest-ranch",
+      "photo_match": "bar x ranch",
+      "photo_search": "Bar X Ranch, Medora, ND",
       "name": "Bar X Guest Ranch",
       "type": "cabin",
       "town": "South of Medora",
@@ -244,6 +252,8 @@
     },
     {
       "id": "kings-guest-ranch",
+      "photo_match": "king's guest ranch",
+      "photo_search": "King's Guest Ranch, Medora, ND",
       "name": "King's Guest Ranch",
       "type": "cabin",
       "town": "Near Medora",
@@ -274,6 +284,7 @@
     },
     {
       "id": "airbnb-medora",
+      "list_units": true,
       "name": "Airbnb rentals around Medora",
       "type": "rentals",
       "town": "Medora area",
@@ -307,6 +318,7 @@
     },
     {
       "id": "vrbo-medora",
+      "list_units": true,
       "name": "Vrbo rentals around Medora",
       "type": "rentals",
       "town": "Medora area",
@@ -327,6 +339,7 @@
     },
     {
       "id": "red-trail-campground",
+      "photo_search": "Red Trail Campground, Medora, ND",
       "name": "Red Trail Campground",
       "type": "camping",
       "town": "Medora",
@@ -342,6 +355,8 @@
     },
     {
       "id": "boots-campground",
+      "photo_match": "boots campground",
+      "photo_search": "Boots Campground, Medora, ND",
       "name": "Boots Campground",
       "type": "camping",
       "town": "Medora",
@@ -358,6 +373,7 @@
     },
     {
       "id": "rough-rider-state-park",
+      "photo_search": "Rough Rider State Park, Medora, ND",
       "name": "Rough Rider State Park",
       "type": "camping",
       "town": "South of Medora",
@@ -372,6 +388,8 @@
     },
     {
       "id": "cottonwood-campground",
+      "photo_match": "cottonwood campground",
+      "photo_search": "Cottonwood Campground, Theodore Roosevelt National Park, ND",
       "name": "Cottonwood Campground, Theodore Roosevelt National Park",
       "type": "camping",
       "town": "Inside the South Unit",
@@ -386,6 +404,8 @@
     },
     {
       "id": "buffalo-gap-campground",
+      "photo_match": "buffalo gap campground",
+      "photo_search": "Buffalo Gap Campground, Medora, ND",
       "name": "Buffalo Gap Campground",
       "type": "camping",
       "town": "West of Medora",
@@ -422,6 +442,8 @@
     },
     {
       "id": "cowboy-inn",
+      "photo_match": "cowboy inn",
+      "photo_search": "Cowboy Inn, Belfield, ND",
       "name": "Cowboy Inn",
       "type": "hotel",
       "town": "Belfield",
@@ -463,6 +485,8 @@
     },
     {
       "id": "wannagan-creek-cabins",
+      "photo_match": "wannagan creek cabins",
+      "photo_search": "Wannagan Creek Cabins, ND",
       "name": "Wannagan Creek Cabins",
       "type": "cabin",
       "town": "North of Medora",
@@ -495,6 +519,7 @@
     },
     {
       "id": "dry-creek-hideaway",
+      "photo_search": "Dry Creek Hideaway, Beach, ND",
       "name": "Dry Creek Hideaway",
       "type": "cabin",
       "town": "Near Beach",
@@ -537,6 +562,7 @@
     },
     {
       "id": "trappers-campground",
+      "photo_match": "trapper's inn",
       "name": "Trapper's Campground",
       "type": "camping",
       "town": "Belfield",
@@ -552,6 +578,8 @@
     },
     {
       "id": "crossings-campground",
+      "photo_match": "crossings campground",
+      "photo_search": "The Crossings Campground, Belfield, ND",
       "name": "The Crossings Campground",
       "type": "camping",
       "town": "Belfield",
@@ -569,6 +597,8 @@
     },
     {
       "id": "whispering-pines",
+      "photo_match": "whispering pines campground",
+      "photo_search": "Whispering Pines Campground, Belfield, ND",
       "name": "Whispering Pines Campground",
       "type": "camping",
       "town": "Belfield",
@@ -586,6 +616,7 @@
     },
     {
       "id": "coal-creek-campground",
+      "photo_search": "Coal Creek Campground, Maah Daah Hey Trail, Medora, ND",
       "name": "Coal Creek Campground",
       "type": "camping",
       "town": "South of Medora",
@@ -601,6 +632,7 @@
     },
     {
       "id": "wannagan-campground",
+      "photo_search": "Wannagan Campground, Maah Daah Hey Trail, ND",
       "name": "Wannagan Campground",
       "type": "camping",
       "town": "North of Medora",
@@ -616,6 +648,7 @@
     },
     {
       "id": "roundup-horse-camp",
+      "photo_search": "Roundup Group Horse Campground, Theodore Roosevelt National Park, ND",
       "name": "Roundup Group Horse Camp, Theodore Roosevelt National Park",
       "type": "camping",
       "town": "Inside the South Unit",
@@ -1007,6 +1040,7 @@
     },
     {
       "id": "camp-on-the-heart",
+      "photo_search": "Camp on the Heart, Dickinson, ND",
       "name": "Camp on the Heart",
       "type": "camping",
       "town": "Dickinson",
@@ -1022,6 +1056,7 @@
     },
     {
       "id": "north-park-campground",
+      "photo_search": "North Park Campground, Dickinson, ND",
       "name": "North Park Campground",
       "type": "camping",
       "town": "Dickinson",
@@ -1036,6 +1071,7 @@
     },
     {
       "id": "patterson-lake",
+      "photo_search": "Patterson Lake Recreation Area, Dickinson, ND",
       "name": "Patterson Lake Recreation Area",
       "type": "camping",
       "town": "Dickinson",

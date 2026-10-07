@@ -1,6 +1,6 @@
 # Lodging Finder: plan and status
 
-Last updated October 6, 2026.
+Last updated October 7, 2026.
 
 ## Why build this
 
@@ -17,6 +17,9 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 - Oct 6: photos come from each property's own website (link-preview image), then Google Hotels; shown from those addresses, never copied.
 - Oct 6: the trolley is mentioned only for stays inside its season (June through September).
 - Oct 6: compact layout. One button per property, phone number as a text link, one-line rows for places to check directly.
+- Oct 7: the one-line rows were too little. Every place is now a card, in four tabs (Medora, Vacation rentals, Nearby towns, Dickinson) on a bar that stays pinned while scrolling.
+- Oct 7: each Airbnb and Vrbo listing is shown as its own card with its photo, instead of one grouped count.
+- Oct 7: every property should have a photo; brand fonts are loaded from trlibrary.com.
 
 ## Status
 
@@ -30,7 +33,7 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 | Collector: Airbnb and Vrbo (`airbnb`, `vrbo`) | Tested live Oct 5; full 330-night calendars |
 | Vacation Medora cabins | Read from their Airbnb calendars (see below); the `guesty` collector is kept but unused |
 | Photos (`collector/photos.py`) | Done; see "Photos" below |
-| Offline tests | 40 pass; they use canned responses shaped like each service's documentation |
+| Offline tests | 54 pass; they use canned responses shaped like each service's documentation |
 | Daily workflow | Written; `.github/workflows/collect.yml` is not in the repository yet, so nothing refreshes on its own |
 | Pages site | Live at lodging.labs.trlibrary.com |
 
@@ -44,15 +47,29 @@ Run `python collector/collect.py --check` and look for:
 
 ## Photos
 
-About 8 of 44 properties publish a usable link-preview image on their own site. Most chain-hotel sites refuse automated requests, several small properties publish none, and a few publish only a logo or one image shared across every page (medora.com gives Hotel 1883 the Rough Riders Hotel picture, so that one is ignored for Hotel 1883 and set by hand for Rough Riders).
+All 50 public properties with a card of their own have a photo (Oct 7), plus all 15 Airbnb and 12 Vrbo listings. Where they come from: 2 set by hand, 7 from the property's own website, 32 from Google Hotels, 8 from Google Maps, 1 from an Airbnb listing, and the listing photos from Airbnb and Vrbo themselves. The README lists the order tried.
 
-Google Hotels fills most of the gap for hotels whenever `google_hotels` runs: its results include a photo for every hotel, and the collector notes the first one. With it, 27 of 44 properties have a photo (Oct 6), including every hotel with live availability. Those can be guest-contributed, so they carry more rights risk than a property's own preview image; `python collector/photos.py --no-google` leaves them out.
+Why so many come from Google: most chain-hotel sites refuse automated requests, several small properties have no website, and some sites publish only a logo or one image shared across every page (medora.com gives Hotel 1883 the Rough Riders Hotel picture, so that one is ignored for Hotel 1883 and set by hand for Rough Riders).
 
-Best long-term fix for the Medora properties: Library-shot or partner-supplied photos set with `"photo"` in `data/properties.json`.
+Cautions:
+
+- Google's photos can be guest-contributed. They carry more rights risk than a property's own image. `python collector/photos.py --no-google` leaves them out.
+- Airbnb and Vrbo listing photos and titles belong to the hosts, and both sites' terms forbid scraping. Showing them one by one is more exposed than showing a count. Remove `"list_units": true` to go back to the count.
+- Photos were checked by eye on Oct 7. Two automatic picks were wrong and are now ruled out: an app advertisement on a National Park Service page and a restaurant interior for a campground.
+
+Best long-term fix: Library-shot or partner-supplied photos set with `"photo"` in `data/properties.json`. Those override everything else.
+
+## New listings
+
+- Vrbo: found automatically. Every run searches the map area in `live.start`, so a new listing inside it appears on its own, subject to the rating floor.
+- Airbnb: not found automatically. The 15 listing IDs are kept by hand in `data/properties.json`.
+- Hotels, cabins and campgrounds: kept by hand.
+
+Option not built: a weekly Airbnb search that proposes new listing IDs for review rather than publishing them unseen.
 
 ## SearchApi plan
 
-The free tier is 100 searches, once. Daily use is about 140 searches (about 4,200 a month), so running `google_hotels` daily needs the Developer plan, $40 a month for 10,000 searches, the smallest paid tier. Without it, leave `google_hotels` out of `LODGING_SOURCES`: the 16 Dickinson hotels, AmericInn Medora and Trapper's Inn then appear under "check directly," and hotel photos from Google are not refreshed.
+The free tier is 100 searches, once (about 45 used by Oct 7, in testing and photo lookups). Daily use is about 140 searches (about 4,200 a month), so running `google_hotels` daily needs the Developer plan, $40 a month for 10,000 searches, the smallest paid tier. Without it, leave `google_hotels` out of `LODGING_SOURCES`: the 16 Dickinson hotels, AmericInn Medora and Trapper's Inn then appear under "check directly," and hotel photos from Google are not refreshed.
 
 ## The Medora Foundation source
 

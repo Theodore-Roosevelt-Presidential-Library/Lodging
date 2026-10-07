@@ -9,7 +9,8 @@
  *   data-heading="off"       hide the built-in heading (when the page has its own)
  *   data-area="medora"       show only Medora-area lodging
  *   data-photos="off"        never show photos
- *   data-photos="all"        also show small photos in the "check directly" lists
+ *   data-fonts="off"         do not load the brand fonts (they are loaded from trlibrary.com on any other site)
+ *   data-sticky-top="94"     pixels to leave above the pinned tab bar (default: measured from the page's own fixed header)
  */
 (function () {
   'use strict';
@@ -36,68 +37,115 @@
     { key: 'camping', label: 'Camping and RV' }
   ];
   var TYPE_NAME = { hotel: 'Hotel or inn', cabin: 'Cabin or ranch stay', rentals: 'Vacation rentals', camping: 'Camping and RV' };
-  var AREAS = [
-    { key: 'medora', label: 'In and around Medora', open: true },
-    { key: 'nearby', label: 'Nearby towns and countryside', open: true },
-    { key: 'dickinson', label: 'Dickinson, about 35 miles east', open: false }
+  // One tab per group of places. Only one group shows at a time, so nothing needs a long scroll.
+  var TABS = [
+    { key: 'medora', label: 'Medora', intro: 'Hotels, cabins and campgrounds in and around Medora.',
+      has: function (p) { return p.type !== 'rentals' && p.area === 'medora'; } },
+    { key: 'rentals', label: 'Vacation rentals', intro: 'Private homes and cabins around Medora, listed by their hosts on Airbnb and Vrbo.',
+      has: function (p) { return p.type === 'rentals'; } },
+    { key: 'nearby', label: 'Nearby towns', intro: 'Towns and countryside within about 45 miles of Medora.',
+      has: function (p) { return p.type !== 'rentals' && p.area === 'nearby'; } },
+    { key: 'dickinson', label: 'Dickinson', intro: 'About 35 miles east of Medora on Interstate 94.',
+      has: function (p) { return p.type !== 'rentals' && p.area === 'dickinson'; } }
   ];
+  var SECTIONS = [
+    { key: 'open', label: 'Open for your dates' },
+    { key: 'check', label: 'Check directly' },
+    { key: 'more', label: 'Search more rentals' },
+    { key: 'closed', label: 'Full or closed on these dates' }
+  ];
+  var SITE = { airbnb: 'Airbnb', vrbo: 'Vrbo' };
+  var ICONS = {
+    hotel: 'M3 19v-8h18v8M3 15h18M6 11V7h5v4M3 19v1.5M21 19v1.5',
+    cabin: 'M3.5 11.5 12 5l8.5 6.5M6 10v9h12v-9M10 19v-5h4v5',
+    rentals: 'M3.5 11.5 12 5l8.5 6.5M6 10v9h12v-9M10 19v-5h4v5',
+    camping: 'M2.5 19 12 5l9.5 14zM12 5v14M9 19l3-5 3 5'
+  };
+
+  // Brand fonts, served by trlibrary.com. Font faces have to be declared on the page itself, not inside the widget.
+  var FONT_BASE = 'https://www.trlibrary.com/themes/custom/trpl/css/';
+  var FONTS = [
+    ['Dharma Gothic E', 700, 'dharma_type-dharmagothice-bold.woff2'],
+    ['Clearface', 400, 'clearfacestd-regular.woff2'],
+    ['Clearface', 700, 'clearfacestd-heavy.woff2'],
+    ['Frutiger', 400, 'frutigerltstd-regular.woff2'],
+    ['Frutiger', 700, 'frutigerltstd-bold.woff2']
+  ];
+  (function loadFonts() {
+    var onMainSite = /^(www\.)?trlibrary\.com$/.test(location.hostname);   // already has them
+    if (opts.fonts === 'off' || onMainSite || document.getElementById('trpl-brand-fonts')) return;
+    var style = document.createElement('style');
+    style.id = 'trpl-brand-fonts';
+    style.textContent = FONTS.map(function (f) {
+      return '@font-face{font-family:"' + f[0] + '";font-weight:' + f[1] + ';font-style:normal;font-display:swap;src:url("' + FONT_BASE + f[2] + '") format("woff2")}';
+    }).join('');
+    document.head.appendChild(style);
+  })();
+  var SANS = 'Frutiger,"Frutiger Next","Helvetica Neue",Arial,sans-serif';
+  var SERIF = 'Clearface,Georgia,"Times New Roman",serif';
 
   var CSS = [
-    ':host{display:block;font-family:inherit;color:#25282A;line-height:1.4;--green:#1B4633;--accent:#E7805D;--accent-dark:#D07556;--line:#D8D5CC;--muted:#5A5F61;--wash:#F6F4EE}',
+    ':host{display:block;font-family:' + SANS + ';color:#25282A;line-height:1.4;--green:#1B4633;--accent:#E7805D;--accent-dark:#D07556;--line:#D8D5CC;--muted:#5A5F61;--wash:#F6F4EE;--bg:#fff;--top:0px}',
     '*{box-sizing:border-box}',
     '.wrap{max-width:1100px;margin:0 auto}',
     'h2{font-family:"Dharma Gothic E","Oswald","Arial Narrow",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(2rem,5vw,3rem);line-height:1;margin:0 0 .35em;color:var(--green)}',
-    'h3{font-family:"Clearface",Georgia,"Times New Roman",serif;font-size:1.35rem;font-weight:700;margin:1.4em 0 .6em;color:var(--green)}',
-    '.count{font-family:inherit;font-weight:400;font-size:.9rem;color:var(--muted);margin-left:.4em}',
-    '.intro{margin:0 0 1em;max-width:46em}',
+    'h3{font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:1.7em 0 .7em;color:var(--green)}',
+    '.count{font-weight:400;font-size:.86rem;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:.6em}',
+    '.intro{font-family:' + SERIF + ';font-size:1.1rem;margin:0 0 1em;max-width:46em}',
     '.controls{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-end;background:var(--wash);border:1px solid var(--line);border-radius:2px;padding:16px}',
     '.field{display:flex;flex-direction:column;gap:4px}',
     'label,.legend{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green)}',
     'input,select{font:inherit;color:inherit;background:#fff;border:1px solid #9A9C9A;border-radius:2px;padding:9px 10px;min-height:44px}',
-    'input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--green);outline-offset:2px}',
+    'input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--green);outline-offset:2px}',
     '.chips{display:flex;flex-wrap:wrap;gap:6px}',
     '.chip{font:inherit;font-size:.92rem;cursor:pointer;background:#fff;color:inherit;border:1px solid #9A9C9A;border-radius:2px;padding:9px 12px;min-height:44px}',
     '.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}',
-    '.summary{margin:1em 0 0;font-weight:700}',
-    /* cards: properties confirmed open */
+    /* the pinned tab bar */
+    '.bar{position:sticky;top:var(--top);z-index:5;display:flex;align-items:flex-end;justify-content:space-between;gap:8px 20px;margin-top:14px;background:var(--bg);border-bottom:1px solid var(--line)}',
+    '.bar.stuck{box-shadow:0 6px 8px -6px rgba(37,40,42,.25)}',
+    '.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;min-width:0}',
+    '.tabs::-webkit-scrollbar{display:none}',
+    '.tab{font:inherit;font-weight:700;font-size:.98rem;white-space:nowrap;cursor:pointer;background:none;color:var(--muted);border:0;border-bottom:4px solid transparent;border-radius:0;padding:12px 14px 9px;min-height:48px;display:inline-flex;align-items:center;gap:8px;margin-bottom:-1px}',
+    '.tab:hover{color:var(--green)}',
+    '.tab[aria-selected="true"]{color:var(--green);border-bottom-color:var(--accent)}',
+    '.tab:focus-visible{outline-offset:-3px}',
+    '.pill{font-weight:700;font-size:.74rem;line-height:1;padding:4px 7px;border-radius:999px;background:var(--green);color:#fff}',
+    '.pill.none{background:var(--wash);color:var(--muted);font-weight:400}',
+    '.when{margin:0;padding:0 2px 12px;font-size:.88rem;font-weight:700;white-space:nowrap}',
+    '.panel{scroll-margin-top:calc(var(--top) + 64px)}',
+    '.panel:focus{outline:none}',
+    '.lede{font-family:' + SERIF + ';margin:14px 0 0;color:var(--muted);font-size:1rem}',
+    /* cards */
     '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}',
-    '.card{display:flex;flex-direction:column;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:2px;background:#fff;overflow:hidden}',
-    '.ph{aspect-ratio:16/9;background:var(--wash);overflow:hidden}',
+    '.grid+.grid{margin-top:14px}',
+    '.card{display:flex;flex-direction:column;border:1px solid var(--line);border-top:4px solid var(--line);border-radius:2px;background:#fff;overflow:hidden}',
+    '.card.open{border-top-color:var(--green)}',
+    '.ph{aspect-ratio:16/9;background:var(--wash);overflow:hidden;display:flex;align-items:center;justify-content:center}',
     '.ph img{display:block;width:100%;height:100%;object-fit:cover}',
+    '.ph svg{width:44px;height:44px;stroke:#B9B5A8;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}',
+    '.card.closed .ph img{filter:grayscale(1);opacity:.75}',
     '.body{display:flex;flex-direction:column;flex:1;padding:12px 14px 14px}',
-    '.name{font-family:"Clearface",Georgia,"Times New Roman",serif;font-size:1.1rem;font-weight:700;line-height:1.2;margin:0 0 3px}',
+    '.name{font-family:' + SERIF + ';font-size:1.15rem;font-weight:700;line-height:1.2;margin:0 0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
     '.meta{font-size:.84rem;color:var(--muted);margin:0 0 6px}',
-    '.blurb{font-size:.9rem;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+    '.blurb{font-family:' + SERIF + ';font-size:.98rem;line-height:1.35;margin:0 0 8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
     '.avail{margin:auto 0 0;padding-top:4px;font-weight:700;color:var(--green)}',
-    '.avail::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;background:var(--green);margin-right:.4em;vertical-align:.08em}',
+    '.avail::before{content:"";display:inline-block;width:.55em;height:.55em;border-radius:50%;background:var(--green);border:2px solid var(--green);margin-right:.4em;vertical-align:.02em}',
+    '.check .avail,.more .avail{color:#25282A}',
+    '.check .avail::before,.more .avail::before{background:transparent;border-color:#8A8D8B}',
+    '.closed .avail{color:var(--muted)}',
+    '.closed .avail::before{background:#8A8D8B;border-color:#8A8D8B}',
     '.fine{font-size:.8rem;color:var(--muted);margin:2px 0 0}',
-    '.actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}',
+    '.actions{display:flex;align-items:center;gap:8px 10px;margin-top:10px}',
     '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 18px;border-radius:2px;font-weight:700;font-size:.95rem;text-decoration:none;white-space:nowrap;border:1px solid var(--accent);background:var(--accent);color:#25282A}',
     '.btn:hover{background:var(--accent-dark);border-color:var(--accent-dark)}',
-    '.tel{font-size:.9rem;color:#25282A;white-space:nowrap;text-decoration:underline;text-underline-offset:2px;padding:10px 0}',
+    '.btn.quiet{background:#fff;border-color:#8A8D8B}',
+    '.btn.quiet:hover{background:var(--wash);border-color:#25282A}',
+    '.tel{margin-left:auto;font-size:.9rem;color:#25282A;white-space:nowrap;text-decoration:underline;text-underline-offset:2px;padding:10px 0}',
     '.tel:hover{color:var(--green)}',
-    /* rows: everything else */
-    '.rows{list-style:none;margin:0;padding:0}',
-    '.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}',
-    '.rows.pics .row{grid-template-columns:72px minmax(0,1fr) auto}',
-    '.thumb{width:72px;height:54px;border-radius:2px;object-fit:cover;background:var(--wash);display:block}',
-    '.row .name{font-size:1.02rem;margin:0}',
-    '.row .meta{margin:2px 0 0}',
-    '.go{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}',
-    '.btn.sm{min-height:40px;padding:6px 14px;font-size:.9rem}',
-    'details{border-top:1px solid var(--line);margin-top:1.4em}',
-    'details.first{border-top:0;margin-top:.6em}',
-    'summary{cursor:pointer;list-style:none;padding:12px 0;font-family:"Clearface",Georgia,"Times New Roman",serif;font-size:1.2rem;font-weight:700;color:var(--green)}',
-    'summary::-webkit-details-marker{display:none}',
-    'summary::before{content:"+";display:inline-block;width:1.1em;font-family:inherit}',
-    'details[open]>summary::before{content:"\\2212"}',
-    '.closed{margin:0;padding:0;list-style:none}',
-    '.closed li{padding:8px 0;border-top:1px solid var(--line)}',
-    '.closed span{color:var(--muted);font-size:.88rem}',
-    '.note{font-size:.82rem;color:var(--muted);margin:1.6em 0 0;max-width:60em}',
+    '.note{font-size:.82rem;color:var(--muted);margin:1.8em 0 0;max-width:60em}',
     '.msg{padding:16px;border:1px solid var(--line);background:var(--wash);border-radius:2px}',
-    '@media (max-width:560px){.controls{flex-direction:column;align-items:stretch}.grid{grid-template-columns:1fr}.count{display:block;margin:2px 0 0}',
-    '.row{grid-template-columns:minmax(0,1fr)}.rows.pics .row{grid-template-columns:72px minmax(0,1fr)}.go{grid-column:1/-1;justify-content:flex-start}.btn.sm{min-height:44px}}'
+    '@media (max-width:760px){.bar{flex-direction:column-reverse;align-items:stretch;gap:0}.when{padding:10px 2px 0;font-size:.84rem}}',
+    '@media (max-width:560px){.controls{flex-direction:column;align-items:stretch}.grid{grid-template-columns:1fr}.count{display:block;margin:2px 0 0}.tab{padding:12px 11px 9px;font-size:.93rem}}'
   ].join('\n');
 
   // ---------- small helpers ----------
@@ -120,6 +168,7 @@
   function usDate(iso) { var p = iso.split('-'); return p[1] + '/' + p[2] + '/' + p[0]; }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
   function andBits(a, b) { var out = ''; for (var i = 0; i < a.length; i++) out += (a[i] === '1' && b[i] === '1') ? '1' : '0'; return out; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function checkedText(iso) {
     var d = daysBetween(iso, today());
@@ -147,6 +196,15 @@
     return p.url || null;
   }
 
+  // A single Airbnb or Vrbo listing, opened on the chosen dates.
+  function unitLink(unit, checkin, checkout) {
+    if (!unit.url) return null;
+    var q = unit.src === 'airbnb'
+      ? 'check_in=' + checkin + '&check_out=' + checkout + '&adults=2'
+      : 'chkin=' + checkin + '&chkout=' + checkout + '&startDate=' + checkin + '&endDate=' + checkout + '&adults=2';
+    return unit.url + (unit.url.indexOf('?') < 0 ? '?' : '&') + q;
+  }
+
   // The trolley is seasonal, so it is mentioned only when every night of the stay falls in its season.
   function trolleyRuns(checkin, nights) {
     var months = (DATA && DATA.trolley_months) || [];
@@ -164,8 +222,8 @@
     for (var i = 0; i < nights; i++) {
       var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
       if (!rec || !rec.t || daysBetween(rec.t, now) > STALE_DAYS) return { status: 'unknown' };
-      if (rec.a !== 1) return { status: 'unavailable' };
       if (!oldest || rec.t < oldest) oldest = rec.t;
+      if (rec.a !== 1) return { status: 'unavailable', checked: oldest };
       if (rec.u) {
         // One character per cabin or rental. A unit counts only if it is open every night of the stay.
         grouped = true;
@@ -175,16 +233,27 @@
     }
     if (grouped) {
       var count = (mask.match(/1/g) || []).length;
-      if (!count) return { status: 'unavailable' };
+      if (!count) return { status: 'unavailable', checked: oldest };
       return { status: 'available', checked: oldest, count: count, of: of };
     }
     return { status: 'available', checked: oldest };
   }
 
-  // ---------- rendering ----------
-  var state = { checkin: addDays(today(), 14), nights: 1, type: 'all' };
-  var DATA = null, PHOTOS = {};
-  var results = h('div', { 'aria-live': 'polite' });
+  // For a property whose listings are shown one by one: which of them are open for the whole stay.
+  function unitMask(p, units, data, checkin, nights) {
+    var mask = null, oldest = null, now = today();
+    for (var i = 0; i < nights; i++) {
+      var rec = (data.nights[addDays(checkin, i)] || {})[p.id];
+      if (!rec || !rec.t || !rec.u || rec.u.length !== units.length || daysBetween(rec.t, now) > STALE_DAYS) return null;
+      mask = mask === null ? rec.u : andBits(mask, rec.u);
+      if (!oldest || rec.t < oldest) oldest = rec.t;
+    }
+    return { mask: mask, checked: oldest };
+  }
+
+  // ---------- cards ----------
+  var state = { checkin: addDays(today(), 14), nights: 1, type: 'all', tab: null };
+  var DATA = null, PHOTOS = {}, LISTINGS = {};
 
   function matchesType(p) {
     if (state.type === 'all') return true;
@@ -192,130 +261,276 @@
     return p.type === state.type;
   }
 
-  function photo(p, cls) {
-    var ph = PHOTOS[p.id];
-    if (!ph || !ph.src || opts.photos === 'off') return null;
-    var img = h('img', { class: cls, src: ph.src, alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
-    return img;
+  function telLink(p) {
+    return p.phone ? { tel: true, href: 'tel:+1' + p.phone.replace(/\D/g, '').replace(/^1/, ''), label: p.phone, aria: 'Call ' + p.name + ' at ' + p.phone } : null;
   }
 
-  function metaText(p, trolley, withSeason) {
-    var parts = [TYPE_NAME[p.type], whereText(p)];
-    if (withSeason && p.season) parts.push(p.season);
-    if (trolley && p.trolley) parts.push('Free summer trolley stop');
-    return parts.join(' · ');
-  }
-
-  function actionLinks(p, live, checkin, checkout, small) {
-    var link = bookingLink(p, checkin, checkout), out = [];
-    var label = p.type === 'rentals' ? 'See rentals' : (live ? 'Book' : (p.dated_url ? 'Check dates' : 'Website'));
-    var tel = p.phone ? 'tel:+1' + p.phone.replace(/\D/g, '').replace(/^1/, '') : null;
-    if (link) {
-      out.push(h('a', { class: 'btn' + (small ? ' sm' : ''), href: link, target: '_blank', rel: 'noopener',
-        'aria-label': label + ': ' + p.name + ' (opens in a new tab)', text: label }));
-      if (tel) out.push(h('a', { class: 'tel', href: tel, 'aria-label': 'Call ' + p.name + ' at ' + p.phone, text: p.phone }));
-    } else if (tel) {
-      out.push(h('a', { class: 'btn' + (small ? ' sm' : ''), href: tel, 'aria-label': 'Call ' + p.name + ' at ' + p.phone, text: 'Call ' + p.phone }));
+  // Each of these returns a plain description of one card; draw() turns it into elements.
+  function propCard(p, ev, checkin, checkout, trolley) {
+    var link = bookingLink(p, checkin, checkout), tel = telLink(p);
+    var meta = [TYPE_NAME[p.type], whereText(p)];
+    if (trolley && p.trolley) meta.push('Free summer trolley stop');
+    var c = { type: p.type, name: p.name, meta: meta.join(' · '), blurb: p.blurb, photo: (PHOTOS[p.id] || {}).src, actions: [] };
+    var label;
+    if (ev.status === 'available') {
+      c.section = 'open';
+      c.headline = p.type === 'camping' ? 'Sites available' : 'Rooms available';
+      c.fine = cap(checkedText(ev.checked));
+      if (ev.count) {
+        c.headline = plural(ev.count, p.type === 'rentals' ? 'rental' : 'unit', p.type === 'rentals' ? 'rentals' : 'units') + ' available';
+        c.fine += ' · ' + ev.count + ' of ' + ev.of + ' tracked' + (p.type === 'rentals' ? '; more may be listed' : '');
+      }
+      label = p.type === 'rentals' ? 'See rentals' : 'Book';
+    } else if (ev.status === 'unavailable') {
+      c.section = 'closed';
+      c.headline = 'Full or closed';
+      c.fine = [p.season, ev.checked ? cap(checkedText(ev.checked)) : null].filter(Boolean).join(' · ');
+      label = p.type === 'rentals' ? 'See rentals' : 'Website';
+      c.quiet = true;
+    } else {
+      c.section = 'check';
+      c.headline = link ? 'Check dates directly' : 'Call to check dates';
+      c.fine = p.season || '';
+      label = p.type === 'rentals' ? 'See rentals' : (p.dated_url ? 'Check dates' : 'Website');
     }
+    if (link) {
+      c.actions.push({ href: link, label: label, aria: label + ': ' + p.name + ' (opens in a new tab)' });
+      if (tel) c.actions.push(tel);
+    } else if (tel) {
+      c.actions.push({ href: tel.href, label: 'Call ' + p.phone, aria: tel.aria, same: true });
+    }
+    return c;
+  }
+
+  function unitCard(p, unit, open, checked, checkin, checkout) {
+    var site = SITE[unit.src] || 'the listing site';
+    var c = { type: 'rentals', name: unit.name, meta: 'Vacation rental · Listed on ' + site, blurb: unit.summary || unit.facts,
+      photo: unit.photo, fine: cap(checkedText(checked)), actions: [], site: site, sites: [site], isOpen: open,
+      twin: unit.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() };
+    c.section = open ? 'open' : 'closed';
+    c.headline = open ? 'Available' : 'Booked on these dates';
+    c.quiet = !open;
+    var link = open ? unitLink(unit, checkin, checkout) : unit.url;
+    if (link) c.actions.push({ href: link, label: 'View on ' + site, aria: 'View ' + unit.name + ' on ' + site + ' (opens in a new tab)' });
+    return c;
+  }
+
+  // The Airbnb or Vrbo search itself, offered beside the individual listings.
+  function searchCard(p, shown, extraOpen, checkin, checkout) {
+    var link = bookingLink(p, checkin, checkout);
+    var c = { section: 'more', type: 'rentals', name: p.name, meta: TYPE_NAME.rentals + ' · ' + whereText(p), blurb: p.blurb, actions: [] };
+    c.headline = extraOpen ? plural(extraOpen, 'more rental', 'more rentals') + ' available' : 'More may be listed';
+    c.fine = plural(shown, 'listing is', 'listings are') + ' tracked here.';
+    if (link) c.actions.push({ href: link, label: 'See rentals', aria: 'See rentals: ' + p.name + ' (opens in a new tab)' });
+    return c;
+  }
+
+  function buildCards(p, checkin, checkout, trolley) {
+    var units = p.list_units && DATA.units && DATA.units[p.id];
+    var um = units && units.length ? unitMask(p, units, DATA, checkin, state.nights) : null;
+    if (!um) return [propCard(p, evaluate(p, DATA, checkin, state.nights), checkin, checkout, trolley)];
+    var out = [], shown = 0, extraOpen = 0;
+    units.forEach(function (raw, i) {
+      var extra = LISTINGS[raw.src + ':' + raw.id] || {};
+      if (extra.hidden) return;
+      var unit = { id: raw.id, src: raw.src, url: raw.url, name: raw.name || extra.name, photo: raw.photo || extra.src,
+        summary: extra.summary, facts: raw.facts };
+      var open = um.mask[i] === '1';
+      if (!unit.name) { if (open) extraOpen++; return; }
+      shown++;
+      out.push(unitCard(p, unit, open, um.checked, checkin, checkout));
+    });
+    out.push(searchCard(p, shown, extraOpen, checkin, checkout));
     return out;
   }
 
-  // A card: used only for places confirmed open for the dates.
-  function card(p, ev, checkin, checkout, trolley) {
-    var headline = p.type === 'camping' ? 'Sites available' : 'Rooms available';
-    var fine = checkedText(ev.checked);
-    fine = fine.charAt(0).toUpperCase() + fine.slice(1);
-    if (ev.count) {
-      headline = plural(ev.count, p.type === 'rentals' ? 'rental' : 'unit', p.type === 'rentals' ? 'rentals' : 'units') + ' available';
-      fine += ' · ' + ev.count + ' of ' + ev.of + ' tracked' + (p.type === 'rentals' ? '; more may be listed' : '');
+  // A rental listed on both Airbnb and Vrbo under the same name becomes one card with a button for each.
+  function mergeTwins(cards) {
+    var seen = {}, out = [];
+    cards.forEach(function (c) {
+      var first = c.twin && seen[c.twin];
+      if (!first || first.sites.indexOf(c.site) >= 0) {
+        if (c.twin) seen[c.twin] = c;
+        out.push(c);
+        return;
+      }
+      var both = first.isOpen === c.isOpen;
+      if (c.isOpen && !first.isOpen) {           // open on one site only: show that one
+        first.section = c.section; first.headline = c.headline; first.quiet = c.quiet; first.isOpen = true;
+        first.actions = c.actions;
+      } else if (both) {
+        first.actions = first.actions.concat(c.actions).map(function (a, i) {
+          return { href: a.href, label: i ? c.site : first.sites[0], aria: a.aria };
+        });
+      }
+      first.sites.push(c.site);
+      first.meta = 'Vacation rental · Listed on ' + first.sites.join(' and ');
+      first.photo = first.photo || c.photo;
+      first.blurb = first.blurb || c.blurb;
+    });
+    return out;
+  }
+
+  function frame(c) {
+    var box = h('div', { class: 'ph' });
+    function icon() {
+      box.textContent = '';
+      box.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (ICONS[c.type] || ICONS.hotel) + '"/></svg>';
     }
-    var img = photo(p, '');
-    var frame = img ? h('div', { class: 'ph' }, [img]) : null;
-    if (img) img.addEventListener('error', function () { if (frame.parentNode) frame.parentNode.removeChild(frame); });
-    return h('article', { class: 'card' }, [
-      frame,
+    if (c.photo) {
+      var img = h('img', { src: c.photo, alt: '', loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' });
+      img.addEventListener('error', icon);
+      box.appendChild(img);
+    } else icon();
+    return box;
+  }
+
+  function draw(c, withFrame) {
+    return h('article', { class: 'card ' + c.section }, [
+      withFrame ? frame(c) : null,
       h('div', { class: 'body' }, [
-        h('p', { class: 'name', text: p.name }),
-        h('p', { class: 'meta', text: metaText(p, trolley, false) }),
-        p.blurb ? h('p', { class: 'blurb', text: p.blurb }) : null,
-        h('p', { class: 'avail', text: headline }),
-        h('p', { class: 'fine', text: fine }),
-        h('div', { class: 'actions' }, actionLinks(p, true, checkin, checkout, false))
+        h('p', { class: 'name', text: c.name }),
+        h('p', { class: 'meta', text: c.meta }),
+        c.blurb ? h('p', { class: 'blurb', text: c.blurb }) : null,
+        h('p', { class: 'avail', text: c.headline }),
+        c.fine ? h('p', { class: 'fine', text: c.fine }) : null,
+        c.actions.length ? h('div', { class: 'actions' }, c.actions.map(function (a) {
+          if (a.tel) return h('a', { class: 'tel', href: a.href, 'aria-label': a.aria, text: a.label });
+          return h('a', { class: 'btn' + (c.quiet ? ' quiet' : ''), href: a.href, target: a.same ? null : '_blank', rel: a.same ? null : 'noopener', 'aria-label': a.aria, text: a.label });
+        })) : null
       ])
     ]);
   }
 
-  // A row: used for places to check directly. One line each on a wide screen.
-  function row(p, checkin, checkout, trolley) {
-    var slot = null;
-    if (opts.photos === 'all') {
-      var img = photo(p, 'thumb');
-      slot = img || h('span', { class: 'thumb' });
-      if (img) img.addEventListener('error', function () { img.style.visibility = 'hidden'; });
+  // ---------- page ----------
+  var sentinel = h('div', { 'aria-hidden': 'true' });
+  var tablist = h('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Places to stay, by area' });
+  var when = h('p', { class: 'when', 'aria-live': 'polite' });
+  var bar = h('div', { class: 'bar' }, [tablist, when]);
+  var panel = h('div', { class: 'panel', role: 'tabpanel', tabindex: '-1' });
+  var note = h('p', { class: 'note', text:
+    'Availability is checked for two adults and changes quickly, so the booking site has the final word on rooms and rates. ' +
+    'Lodging listed here, including rentals on Airbnb and Vrbo, is run by independent businesses and hosts, not by the Library. ' +
+    'Photos come from each property’s website or its public listing.' });
+  var model = [];
+
+  function compute() {
+    var checkin = state.checkin, checkout = addDays(checkin, state.nights), trolley = trolleyRuns(checkin, state.nights);
+    var props = DATA.properties.filter(function (p) { return matchesType(p) && (!opts.area || p.area === opts.area); });
+    model = TABS.map(function (tab) {
+      var cards = [];
+      props.filter(tab.has).forEach(function (p) { cards = cards.concat(buildCards(p, checkin, checkout, trolley)); });
+      cards = mergeTwins(cards);
+      return { tab: tab, cards: cards, open: cards.filter(function (c) { return c.section === 'open'; }).length };
+    }).filter(function (m) { return m.cards.length; });
+    var keys = model.map(function (m) { return m.tab.key; });
+    if (keys.indexOf(state.tab) < 0) {
+      var firstOpen = model.filter(function (m) { return m.open; })[0];
+      state.tab = (firstOpen || model[0] || { tab: {} }).tab.key || null;
     }
-    return h('li', { class: 'row' }, [
-      slot,
-      h('div', null, [h('p', { class: 'name', text: p.name }), h('p', { class: 'meta', text: metaText(p, trolley, true) })]),
-      h('div', { class: 'go' }, actionLinks(p, false, checkin, checkout, true))
-    ]);
+    when.textContent = nice(checkin) + ' to ' + nice(checkout) + ' · ' + plural(state.nights, 'night', 'nights');
+  }
+
+  function drawTabs() {
+    tablist.textContent = '';
+    bar.style.display = model.length ? '' : 'none';
+    tablist.style.display = model.length > 1 ? '' : 'none';
+    model.forEach(function (m, i) {
+      var on = m.tab.key === state.tab;
+      var b = h('button', { type: 'button', class: 'tab', role: 'tab', id: 'tab-' + m.tab.key, 'aria-selected': String(on),
+        'aria-controls': 'panel', tabindex: on ? '0' : '-1' }, [
+        m.tab.label,
+        h('span', { class: 'pill' + (m.open ? '' : ' none'), text: m.open ? m.open + ' open' : String(m.cards.length) })
+      ]);
+      b.addEventListener('click', function () { pick(m.tab.key, false); });
+      b.addEventListener('keydown', function (e) {
+        var to = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? model.length - 1 : null;
+        if (to === null) return;
+        e.preventDefault();
+        pick(model[(to + model.length) % model.length].tab.key, true);
+      });
+      tablist.appendChild(b);
+    });
+  }
+
+  function drawPanel() {
+    panel.textContent = '';
+    panel.id = 'panel';
+    var m = model.filter(function (x) { return x.tab.key === state.tab; })[0];
+    if (!m) {
+      panel.removeAttribute('aria-labelledby');
+      panel.appendChild(h('p', { class: 'msg', text: 'Nothing matches that filter. Try All.' }));
+      return;
+    }
+    panel.setAttribute('aria-labelledby', 'tab-' + m.tab.key);
+    panel.appendChild(h('p', { class: 'lede', text: m.tab.intro }));
+    SECTIONS.forEach(function (s) {
+      var list = m.cards.filter(function (c) { return c.section === s.key; });
+      if (!list.length) return;
+      // Cards in a row always line up: either every card in the group gets a photo panel, or the ones with
+      // photos go first in rows of their own.
+      var pics = opts.photos === 'off' ? [] : list.filter(function (c) { return c.photo; });
+      var plain = list.filter(function (c) { return pics.indexOf(c) < 0; });
+      var unit = s.key === 'more' ? null : plural(list.length, 'place', 'places');
+      panel.appendChild(h('h3', null, [s.label, unit ? h('span', { class: 'count', text: unit }) : null]));
+      if (pics.length * 2 >= list.length) {
+        // Most have a photo: keep the listed order and give the few without one a plain panel.
+        panel.appendChild(h('div', { class: 'grid' }, list.map(function (c) { return draw(c, pics.length > 0); })));
+      } else {
+        if (pics.length) panel.appendChild(h('div', { class: 'grid' }, pics.map(function (c) { return draw(c, true); })));
+        panel.appendChild(h('div', { class: 'grid' }, plain.map(function (c) { return draw(c, false); })));
+      }
+    });
   }
 
   function render() {
-    results.textContent = '';
     if (!DATA) return;
-    var checkin = state.checkin, checkout = addDays(checkin, state.nights);
-    var trolley = trolleyRuns(checkin, state.nights);
-    var props = DATA.properties.filter(function (p) { return matchesType(p) && (!opts.area || p.area === opts.area); });
-    var open = [], closed = [], other = [];
-    props.forEach(function (p) {
-      var ev = evaluate(p, DATA, checkin, state.nights);
-      if (ev.status === 'available') open.push({ p: p, ev: ev });
-      else if (ev.status === 'unavailable') closed.push(p);
-      else other.push(p);
-    });
+    compute();
+    drawTabs();
+    drawPanel();
+  }
 
-    results.appendChild(h('p', { class: 'summary', text: nice(checkin) + ' to ' + nice(checkout) + ', ' + plural(state.nights, 'night', 'nights') }));
+  // Switch tabs. If the bar is pinned, bring the top of the new panel up under it.
+  function pick(key, focus) {
+    state.tab = key;
+    drawTabs();
+    drawPanel();
+    var on = root.getElementById('tab-' + key);
+    if (on) {
+      if (focus) on.focus();
+      if (on.scrollIntoView && tablist.scrollWidth > tablist.clientWidth) tablist.scrollLeft = Math.max(0, on.offsetLeft - 24);
+    }
+    var top = stickyTop();
+    if (sentinel.getBoundingClientRect().top < top) {
+      window.scrollTo(0, window.pageYOffset + sentinel.getBoundingClientRect().top - top);
+    }
+  }
 
-    // Dickinson is a 35-mile drive, so its open hotels sit in their own fold below the nearer ones.
-    var openNear = open.filter(function (o) { return o.p.area !== 'dickinson'; });
-    var openFar = open.filter(function (o) { return o.p.area === 'dickinson'; });
-    function cards(list) { return h('div', { class: 'grid' }, list.map(function (o) { return card(o.p, o.ev, checkin, checkout, trolley); })); }
-    if (open.length) {
-      results.appendChild(h('h3', null, ['Open for your dates', h('span', { class: 'count', text: plural(open.length, 'place', 'places') + ' with rooms or sites when last checked' })]));
-      if (openNear.length) results.appendChild(cards(openNear));
-      if (openFar.length) {
-        results.appendChild(h('details', openNear.length ? { class: 'first' } : { class: 'first', open: '' }, [
-          h('summary', null, ['Dickinson, about 35 miles east', h('span', { class: 'count', text: plural(openFar.length, 'hotel', 'hotels') + ' showing rooms' })]),
-          cards(openFar)
-        ]));
+  // Leave room for the page's own pinned header, if it has one.
+  function stickyTop() {
+    if (opts.stickyTop !== undefined && !isNaN(parseFloat(opts.stickyTop))) return parseFloat(opts.stickyTop);
+    var hits = document.elementsFromPoint ? document.elementsFromPoint(Math.round(window.innerWidth / 2), 2) : [];
+    for (var i = 0; i < hits.length; i++) {
+      for (var el = hits[i]; el && el !== document.documentElement && el !== document.body; el = el.parentElement) {
+        if (el === host) break;
+        var pos = getComputedStyle(el).position;
+        if (pos === 'fixed' || pos === 'sticky') {
+          var r = el.getBoundingClientRect();
+          if (r.top <= 2 && r.height < window.innerHeight / 2) return Math.round(r.bottom);
+        }
       }
     }
-
-    AREAS.forEach(function (area) {
-      var list = other.filter(function (p) { return p.area === area.key; });
-      if (!list.length) return;
-      results.appendChild(h('details', area.open || !open.length ? { open: '' } : null, [
-        h('summary', null, [area.label, h('span', { class: 'count', text: plural(list.length, 'place', 'places') + ' to check directly' })]),
-        h('ul', { class: opts.photos === 'all' ? 'rows pics' : 'rows' }, list.map(function (p) { return row(p, checkin, checkout, trolley); }))
-      ]));
-    });
-
-    if (closed.length) {
-      results.appendChild(h('details', null, [
-        h('summary', null, ['Full or closed on these dates', h('span', { class: 'count', text: plural(closed.length, 'place', 'places') })]),
-        h('ul', { class: 'closed' }, closed.map(function (p) {
-          return h('li', null, [p.name, ' ', h('span', { text: '· ' + p.season })]);
-        }))
-      ]));
-    }
-
-    if (!open.length && !other.length && !closed.length) {
-      results.appendChild(h('p', { class: 'msg', text: 'Nothing matches that filter. Try All.' }));
-    }
-    results.appendChild(h('p', { class: 'note', text:
-      'Availability is checked for two adults and changes quickly, so the booking site has the final word on rooms and rates. ' +
-      'Lodging listed here is run by independent businesses, not by the Library. Photos are shown from each property’s own website.' }));
+    return 0;
   }
+  var ticking = false;
+  function place() {
+    ticking = false;
+    var top = stickyTop();
+    host.style.setProperty('--top', top + 'px');
+    var stuck = sentinel.getBoundingClientRect().top < top && wrap.getBoundingClientRect().bottom > top + 60;
+    bar.className = stuck ? 'bar stuck' : 'bar';
+  }
+  function schedule() { if (!ticking) { ticking = true; (window.requestAnimationFrame || setTimeout)(place); } }
 
   function controls() {
     var min = today();
@@ -345,7 +560,7 @@
   root.appendChild(wrap);
   if (opts.heading !== 'off') {
     wrap.appendChild(h('h2', { text: 'Find a place to stay' }));
-    wrap.appendChild(h('p', { class: 'intro', text: 'Pick your dates to see which Medora hotels, cabins and campgrounds have room, then book directly with the property.' }));
+    wrap.appendChild(h('p', { class: 'intro', text: 'Pick your dates to see which Medora hotels, cabins, rentals and campgrounds have room, then book directly with the property.' }));
   }
   var loading = h('p', { class: 'msg', text: 'Loading places to stay…' });
   wrap.appendChild(loading);
@@ -361,10 +576,13 @@
     DATA = res[0];
     DATA.nights = DATA.nights || {};
     PHOTOS = (res[1] && res[1].photos) || {};
+    LISTINGS = (res[1] && res[1].listings) || {};
     wrap.removeChild(loading);
-    wrap.appendChild(controls());
-    wrap.appendChild(results);
+    [controls(), sentinel, bar, panel, note].forEach(function (el) { wrap.appendChild(el); });
     render();
+    place();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
   }).catch(function () {
     loading.textContent = '';
     loading.appendChild(document.createTextNode('The lodging finder could not load. '));
