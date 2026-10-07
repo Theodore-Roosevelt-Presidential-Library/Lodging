@@ -18,11 +18,32 @@ Optional attributes on the script tag:
 | `data-area="medora"` | Shows only Medora-area lodging (`medora`, `nearby` or `dickinson`) |
 | `data-photos="off"` | Never shows photos |
 | `data-fonts="off"` | Does not load the brand fonts |
+| `data-url="on"` | Keeps the chosen dates, tab and filter in the page address, so a view can be copied and shared. On for the preview page |
 | `data-sticky-top="94"` | Pixels to leave above the pinned tab bar. By default the widget measures the page's own fixed header and sits just below it |
 
 The widget renders in a shadow root, so page styles do not leak in or out.
 
 Fonts are the brand faces trlibrary.com uses: Dharma Gothic E for the heading, Clearface for names and descriptions, Frutiger for labels, tabs and buttons. On trlibrary.com the page already has them. Anywhere else (including lodging.labs) the widget loads the five font files from `www.trlibrary.com/themes/custom/trpl/css/`, which serves them to any site. No font files are stored in this repository.
+
+### Linking to a view
+
+The page address can open the finder on a particular view. All parts are optional:
+
+`?checkin=2027-06-18&nights=2&tab=rentals&type=cabin&place=hotel-1883`
+
+| Part | Values |
+|---|---|
+| `checkin` | A date, `YYYY-MM-DD`. Past dates are ignored |
+| `nights` | 1 to 7 |
+| `tab` | `medora`, `rentals`, `nearby`, `dickinson` |
+| `type` | `all`, `hotel`, `cabin`, `camping` |
+| `place` | A property id from `data/properties.json`. Its card is scrolled into view and outlined. If `tab` is left out, the tab that place is in opens |
+
+This works wherever the widget is embedded, so staff can send a visitor a link to trlibrary.com with dates already chosen.
+
+## Staff monitor
+
+`monitor.html` is a grid of every tracked night against every tracked property, using the full width of the window and scrolling with the page (the header row stays in view). Each cell is a link: it opens the finder in a second tab on that night, on the right tab, with that property outlined. The night in the first column opens the finder on that night; the Dickinson count opens the Dickinson tab. Rows in "Recent changes" link the same way.
 
 ## What visitors see
 

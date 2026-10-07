@@ -15,31 +15,44 @@
   :root{--green:#1B4633;--accent:#E7805D;--line:#D8D5CC;--muted:#5A5F61;--wash:#F6F4EE}
   *{box-sizing:border-box}
   body{margin:0;font-family:"Frutiger","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:15px;color:#25282A;background:#fff}
-  main{max-width:1200px;margin:0 auto;padding:28px 20px 64px}
-  h1{font-size:26px;margin:0 0 4px;color:var(--green)}
-  h2{font-size:18px;margin:32px 0 10px;color:var(--green)}
-  .sub{color:var(--muted);margin:0 0 20px}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+  main{padding:24px 24px 64px}
+  h1{font-family:"Dharma Gothic E","Arial Narrow",sans-serif;text-transform:uppercase;font-size:44px;line-height:1;margin:0 0 6px;color:var(--green)}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.05em;margin:36px 0 10px;color:var(--green)}
+  a{color:inherit}
+  .sub{color:var(--muted);margin:0 0 18px;max-width:70em}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
   .tile{border:1px solid var(--line);border-radius:2px;padding:14px;background:var(--wash)}
   .tile b{display:block;font-size:26px;color:var(--green)}
   .tile span{color:var(--muted);font-size:13px}
-  .bar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 12px}
+  .bar{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:0 0 12px}
   select,input{font:inherit}
-  .scroll{overflow:auto;max-height:72vh;border:1px solid var(--line)}
-  table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
-  th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-  th:first-child,td:first-child{text-align:left}
-  thead th{position:sticky;top:0;background:#fff;border-bottom:2px solid var(--green);font-size:13px;white-space:normal;vertical-align:bottom}
+  .how{color:var(--muted);font-size:13px;margin-left:auto}
+  /* The grid uses the whole window and scrolls with the page; only the header row stays put. */
+  table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums}
+  th,td{border-bottom:1px solid var(--line);text-align:center;overflow:hidden;text-overflow:ellipsis}
+  th{padding:8px 6px}
+  td{padding:0;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;width:118px}
+  thead th{position:sticky;top:0;z-index:2;background:#fff;box-shadow:inset 0 -2px 0 var(--green);border-bottom:0;font-size:13px;line-height:1.25;vertical-align:bottom;overflow-wrap:break-word;hyphens:auto}
+  td a,td>span{display:block;padding:6px 8px;text-decoration:none}
+  td a:hover,td a:focus-visible{box-shadow:inset 0 0 0 2px var(--green);outline:none}
+  td:first-child a:hover{text-decoration:underline;box-shadow:none}
+  tbody tr:hover td:first-child{background:var(--wash)}
   tr.we td:first-child{font-weight:700}
   td.open{background:#E6EFE9}
   td.full{background:#F7DDD3;color:#7A2E15}
   td.none{color:#9A9C9A}
-  td small{color:var(--muted);margin-left:4px}
-  tr.month td{background:var(--green);color:#fff;font-weight:700;text-align:left}
+  td small{color:var(--muted);margin-left:5px;font-size:12px}
+  tr.month td{background:var(--green);color:#fff;font-weight:700;text-align:left;padding:6px 8px;scroll-margin-top:70px}
   .legend span{display:inline-block;padding:2px 8px;margin-right:8px;border:1px solid var(--line);font-size:13px}
   .empty{padding:16px;border:1px solid var(--line);background:var(--wash)}
   .src span{display:inline-block;margin:0 8px 8px 0;padding:2px 8px;border:1px solid var(--line);font-size:13px;color:var(--muted)}
   .src span.bad{border-color:#B4492A;color:#7A2E15;background:#F7DDD3}
+  #changes table{table-layout:auto;width:auto;min-width:50%}
+  #changes th,#changes td{text-align:left;padding:6px 14px 6px 8px;white-space:normal}
+  #changes thead th{position:static}
+  #changes td a{display:inline;padding:0;text-decoration:underline}
+  @media (max-width:1000px){.wide{overflow-x:auto}table#grid{min-width:1000px}thead th{position:static}main{padding:16px 12px 48px}}
 </style>
 </head>
 <body>
@@ -52,8 +65,9 @@
     <label>Jump to <select id="jump"></select></label>
     <label><input type="checkbox" id="we"> Fridays and Saturdays only</label>
     <span class="legend"><span style="background:#E6EFE9">Open</span><span style="background:#F7DDD3">Full or closed</span><span>— not checked yet</span></span>
+    <span class="how">Click any cell or night to open it in the <a href="index.html" target="finder">lodging finder</a>.</span>
   </div>
-  <div class="scroll"><table id="grid"><thead></thead><tbody></tbody></table></div>
+  <div class="wide"><table id="grid"><thead></thead><tbody></tbody></table></div>
   <h2>Recent changes</h2>
   <div id="changes" class="empty">No changes logged yet.</div>
 </main>
@@ -64,6 +78,16 @@
   function fmt(iso,o){return parse(iso).toLocaleDateString('en-US',Object.assign({timeZone:'UTC'},o));}
   function el(tag,text,cls){var e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
   function isWeekend(iso){var d=parse(iso).getUTCDay();return d===5||d===6;}
+  // Column headings: the short form of a property name; the full name shows on hover.
+  function shortName(name){return name.split(/,| and | by | around /)[0];}
+  // The finder's tab for a property, and a link that opens the finder on a night with that property picked out.
+  function tabOf(p){return p.type==='rentals'?'rentals':p.area;}
+  function finder(night,p,tab){
+    var q='checkin='+night+'&nights=1';
+    if(p) q+='&tab='+tabOf(p)+'&place='+encodeURIComponent(p.id); else if(tab) q+='&tab='+tab;
+    return 'index.html?'+q;
+  }
+  function link(text,href,title){var a=el('a',text);a.href=href;a.target='finder';if(title)a.title=title;return a;}
 
   Promise.all([
     fetch('data/availability.json',{cache:'no-cache'}).then(function(r){return r.json();}),
@@ -75,7 +99,7 @@
     var dick=allLive.filter(function(p){return p.live.source==='google_hotels'&&p.area==='dickinson';});
     var live=allLive.filter(function(p){return dick.indexOf(p)<0;});
     var nights=Object.keys(data.nights||{}).sort();
-    var names={}; data.properties.forEach(function(p){names[p.id]=p.name;});
+    var names={}, byId={}; data.properties.forEach(function(p){names[p.id]=p.name; byId[p.id]=p;});
 
     document.getElementById('sub').textContent='Whether a one-night stay for two adults could be booked. Last refreshed '+
       new Date(data.generated_at).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})+'.';
@@ -96,8 +120,8 @@
     // grid
     var thead=document.querySelector('#grid thead'), tbody=document.querySelector('#grid tbody');
     var hr=el('tr'); hr.appendChild(el('th','Night'));
-    live.forEach(function(p){hr.appendChild(el('th',p.name));});
-    if(dick.length) hr.appendChild(el('th','Dickinson hotels showing rooms'));
+    live.forEach(function(p){var th=el('th',shortName(p.name));th.title=p.name;hr.appendChild(th);});
+    if(dick.length){var dh=el('th','Dickinson hotels');dh.title='How many of the '+dick.length+' tracked Dickinson hotels showed rooms';hr.appendChild(dh);}
     thead.appendChild(hr);
     var span=live.length+1+(dick.length?1:0);
     var srcBox=document.getElementById('sources');
@@ -115,17 +139,25 @@
         if(m!==month){month=m;var mr=el('tr',undefined,'month');mr.id='m'+m;var mc=el('td',fmt(n,{month:'long',year:'numeric'}));mc.colSpan=span;mr.appendChild(mc);tbody.appendChild(mr);
           var o=el('option',fmt(n,{month:'long',year:'numeric'}));o.value='m'+m;jump.appendChild(o);}
         var tr=el('tr',undefined,isWeekend(n)?'we':'');
-        tr.appendChild(el('td',fmt(n,{weekday:'short',month:'short',day:'numeric'})));
+        var day=fmt(n,{weekday:'short',month:'short',day:'numeric'});
+        var first=el('td'); first.appendChild(link(day,finder(n),'Open '+day+' in the lodging finder')); tr.appendChild(first);
         live.forEach(function(p){
-          var rec=data.nights[n][p.id], td;
-          if(!rec) td=el('td','—','none');
-          else if(rec.a===1){var cnt=rec.u?(rec.u.match(/1/g)||[]).length:0; td=el('td',rec.u?cnt+' of '+(rec.of||rec.u.length)+' open':'Open','open'); if(rec.q&&rec.q<=3) td.appendChild(el('small',rec.q+' left')); td.title='checked '+rec.t;}
-          else {td=el('td','Full or closed','full'); td.title='checked '+rec.t;}
-          tr.appendChild(td);
+          var rec=data.nights[n][p.id], td=el('td'), text, tip=p.name+', '+day;
+          if(!rec){td.className='none'; text='—'; tip+=': not checked yet';}
+          else if(rec.a===1){
+            td.className='open';
+            text=rec.u?(rec.u.match(/1/g)||[]).length+' of '+(rec.of||rec.u.length):'Open';
+            tip+=': '+(rec.u?text+' open':'open')+', checked '+rec.t;
+          } else {td.className='full'; text='Full'; tip+=': full or closed, checked '+rec.t;}
+          var a=link(text,finder(n,p),tip);
+          if(rec&&rec.a===1&&rec.q&&rec.q<=3) a.appendChild(el('small',rec.q+' left'));
+          td.appendChild(a); tr.appendChild(td);
         });
         if(dick.length){
           var open=dick.filter(function(p){var r=data.nights[n][p.id];return r&&r.a===1;}).length;
-          tr.appendChild(open?el('td',open+' of '+dick.length,'open'):el('td','—','none'));
+          var dc=el('td',undefined,open?'open':'none');
+          dc.appendChild(link(open?open+' of '+dick.length:'—',finder(n,null,'dickinson'),'Dickinson hotels, '+day));
+          tr.appendChild(dc);
         }
         tbody.appendChild(tr);
       });
@@ -137,12 +169,17 @@
     // changes
     var rows=csv.trim().split('\n').slice(1).filter(Boolean).map(function(l){return l.split(',');});
     if(rows.length){
-      var box=document.getElementById('changes'); box.className='scroll'; box.textContent='';
+      var box=document.getElementById('changes'); box.className=''; box.textContent='';
       var t=el('table'), th=el('tr'); ['Checked','Night','Property','Change'].forEach(function(x){th.appendChild(el('th',x));});
       var thd=el('thead'); thd.appendChild(th); t.appendChild(thd); var tb=el('tbody');
       rows.slice(-60).reverse().forEach(function(r){
         var tr=el('tr'); var what=r[3]==='opened'?'Opened up':'Sold out or closed';
-        [r[0],fmt(r[1],{weekday:'short',month:'short',day:'numeric',year:'numeric'}),names[r[2]]||r[2],what].forEach(function(x,i){var td=el('td',x);if(i)td.style.textAlign='left';tr.appendChild(td);});
+        var night=fmt(r[1],{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+        [r[0],night,names[r[2]]||r[2],what].forEach(function(x,i){
+          var td=el('td');
+          if(i===1) td.appendChild(link(x,finder(r[1],byId[r[2]]),'Open in the lodging finder')); else td.textContent=x;
+          tr.appendChild(td);
+        });
         tb.appendChild(tr);
       });
       t.appendChild(tb); box.appendChild(t);

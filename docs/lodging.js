@@ -9,8 +9,14 @@
  *   data-heading="off"       hide the built-in heading (when the page has its own)
  *   data-area="medora"       show only Medora-area lodging
  *   data-photos="off"        never show photos
+ *   data-url="on"            keep the chosen dates, tab and filter in the page address, so the view can be shared
  *   data-fonts="off"         do not load the brand fonts (they are loaded from trlibrary.com on any other site)
  *   data-sticky-top="94"     pixels to leave above the pinned tab bar (default: measured from the page's own fixed header)
+ *
+ * The page address can open the finder on a particular view (all optional):
+ *   ?checkin=2027-06-18&nights=2&tab=rentals&type=cabin&place=hotel-1883
+ *   tab: medora | rentals | nearby | dickinson     type: all | hotel | cabin | camping
+ *   place: a property id from data/properties.json; its card is brought into view and outlined
  */
 (function () {
   'use strict';
@@ -120,6 +126,7 @@
     '.grid+.grid{margin-top:14px}',
     '.card{display:flex;flex-direction:column;border:1px solid var(--line);border-top:4px solid var(--line);border-radius:2px;background:#fff;overflow:hidden}',
     '.card.open{border-top-color:var(--green)}',
+    '.card.hit{outline:3px solid var(--accent);outline-offset:3px;scroll-margin-top:calc(var(--top) + 80px)}',
     '.ph{aspect-ratio:16/9;background:var(--wash);overflow:hidden;display:flex;align-items:center;justify-content:center}',
     '.ph img{display:block;width:100%;height:100%;object-fit:cover}',
     '.ph svg{width:44px;height:44px;stroke:#B9B5A8;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}',
@@ -252,7 +259,34 @@
   }
 
   // ---------- cards ----------
-  var state = { checkin: addDays(today(), 14), nights: 1, type: 'all', tab: null };
+  var state = { checkin: addDays(today(), 14), nights: 1, type: 'all', tab: null, place: null };
+  var PARAMS = ['checkin', 'nights', 'tab', 'type', 'place'];
+
+  // Open on the view named in the page address, if any.
+  (function readAddress() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var ci = q.get('checkin'), n = parseInt(q.get('nights'), 10), type = q.get('type'), tab = q.get('tab');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(ci || '') && !isNaN(parse(ci)) && ci >= today()) state.checkin = ci;
+    if (n >= 1 && n <= MAX_NIGHTS) state.nights = n;
+    if (TYPES.some(function (t) { return t.key === type; })) state.type = type;
+    if (TABS.some(function (t) { return t.key === tab; })) state.tab = tab;
+    state.place = q.get('place') || null;
+  })();
+
+  function writeAddress() {
+    if (opts.url !== 'on' || !window.history || !history.replaceState) return;
+    try {
+      var q = new URLSearchParams(location.search);
+      PARAMS.forEach(function (k) { q.delete(k); });
+      q.set('checkin', state.checkin);
+      q.set('nights', state.nights);
+      if (state.tab) q.set('tab', state.tab);
+      if (state.type !== 'all') q.set('type', state.type);
+      if (state.place) q.set('place', state.place);
+      history.replaceState(null, '', location.pathname + '?' + q.toString() + location.hash);
+    } catch (e) { /* the address is a convenience; the finder works without it */ }
+  }
   var DATA = null, PHOTOS = {}, LISTINGS = {};
 
   function matchesType(p) {
@@ -270,7 +304,7 @@
     var link = bookingLink(p, checkin, checkout), tel = telLink(p);
     var meta = [TYPE_NAME[p.type], whereText(p)];
     if (trolley && p.trolley) meta.push('Free summer trolley stop');
-    var c = { type: p.type, name: p.name, meta: meta.join(' · '), blurb: p.blurb, photo: (PHOTOS[p.id] || {}).src, actions: [] };
+    var c = { id: p.id, prop: p.id, type: p.type, name: p.name, meta: meta.join(' · '), blurb: p.blurb, photo: (PHOTOS[p.id] || {}).src, actions: [] };
     var label;
     if (ev.status === 'available') {
       c.section = 'open';
@@ -304,7 +338,7 @@
 
   function unitCard(p, unit, open, checked, checkin, checkout) {
     var site = SITE[unit.src] || 'the listing site';
-    var c = { type: 'rentals', name: unit.name, meta: 'Vacation rental · Listed on ' + site, blurb: unit.summary || unit.facts,
+    var c = { id: p.id + ':' + unit.id, prop: p.id, type: 'rentals', name: unit.name, meta: 'Vacation rental · Listed on ' + site, blurb: unit.summary || unit.facts,
       photo: unit.photo, fine: cap(checkedText(checked)), actions: [], site: site, sites: [site], isOpen: open,
       twin: unit.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() };
     c.section = open ? 'open' : 'closed';
@@ -318,7 +352,7 @@
   // The Airbnb or Vrbo search itself, offered beside the individual listings.
   function searchCard(p, shown, extraOpen, checkin, checkout) {
     var link = bookingLink(p, checkin, checkout);
-    var c = { section: 'more', type: 'rentals', name: p.name, meta: TYPE_NAME.rentals + ' · ' + whereText(p), blurb: p.blurb, actions: [] };
+    var c = { id: shown ? null : p.id, prop: p.id, section: 'more', type: 'rentals', name: p.name, meta: TYPE_NAME.rentals + ' · ' + whereText(p), blurb: p.blurb, actions: [] };
     c.headline = extraOpen ? plural(extraOpen, 'more rental', 'more rentals') + ' available' : 'More may be listed';
     c.fine = plural(shown, 'listing is', 'listings are') + ' tracked here.';
     if (link) c.actions.push({ href: link, label: 'See rentals', aria: 'See rentals: ' + p.name + ' (opens in a new tab)' });
@@ -386,7 +420,7 @@
   }
 
   function draw(c, withFrame) {
-    return h('article', { class: 'card ' + c.section }, [
+    return h('article', { class: 'card ' + c.section + (state.place && c.id === state.place ? ' hit' : ''), 'data-id': c.id || null }, [
       withFrame ? frame(c) : null,
       h('div', { class: 'body' }, [
         h('p', { class: 'name', text: c.name }),
@@ -424,6 +458,10 @@
       return { tab: tab, cards: cards, open: cards.filter(function (c) { return c.section === 'open'; }).length };
     }).filter(function (m) { return m.cards.length; });
     var keys = model.map(function (m) { return m.tab.key; });
+    if (state.place && !state.tab) {   // a link that names a place opens the tab that place is in
+      var home = model.filter(function (m) { return m.cards.some(function (c) { return c.prop === state.place; }); })[0];
+      if (home) state.tab = home.tab.key;
+    }
     if (keys.indexOf(state.tab) < 0) {
       var firstOpen = model.filter(function (m) { return m.open; })[0];
       state.tab = (firstOpen || model[0] || { tab: {} }).tab.key || null;
@@ -488,6 +526,14 @@
     compute();
     drawTabs();
     drawPanel();
+    writeAddress();
+  }
+
+  // Bring the card named in the address into view, once. A group shown listing by listing (Airbnb, Vrbo)
+  // has no card of its own, so its link just opens the tab.
+  function showPlace() {
+    var hit = state.place && panel.querySelector('.card.hit');
+    if (hit && hit.scrollIntoView) setTimeout(function () { place(); hit.scrollIntoView({ block: 'center' }); }, 60);
   }
 
   // Switch tabs. If the bar is pinned, bring the top of the new panel up under it.
@@ -495,6 +541,7 @@
     state.tab = key;
     drawTabs();
     drawPanel();
+    writeAddress();
     var on = root.getElementById('tab-' + key);
     if (on) {
       if (focus) on.focus();
@@ -538,6 +585,7 @@
     date.addEventListener('change', function () { if (date.value && date.value >= min) { state.checkin = date.value; render(); } });
     var nights = h('select', { id: 'nt' });
     for (var i = 1; i <= MAX_NIGHTS; i++) nights.appendChild(h('option', { value: i, text: plural(i, 'night', 'nights') }));
+    nights.value = String(state.nights);
     nights.addEventListener('change', function () { state.nights = +nights.value; render(); });
     var chips = TYPES.map(function (t) {
       var b = h('button', { type: 'button', class: 'chip', 'aria-pressed': String(t.key === state.type), text: t.label });
@@ -581,6 +629,7 @@
     [controls(), sentinel, bar, panel, note].forEach(function (el) { wrap.appendChild(el); });
     render();
     place();
+    showPlace();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
   }).catch(function () {

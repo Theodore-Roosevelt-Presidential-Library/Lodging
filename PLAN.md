@@ -20,6 +20,7 @@ The Medora Foundation operates 460 of Medora's 546 hotel rooms and books them on
 - Oct 7: the one-line rows were too little. Every place is now a card, in four tabs (Medora, Vacation rentals, Nearby towns, Dickinson) on a bar that stays pinned while scrolling.
 - Oct 7: each Airbnb and Vrbo listing is shown as its own card with its photo, instead of one grouped count.
 - Oct 7: every property should have a photo; brand fonts are loaded from trlibrary.com.
+- Oct 7: the monitor uses the full window with no inner scroll box, and every cell opens the finder on that night and property. The finder reads `checkin`, `nights`, `tab`, `type` and `place` from the page address.
 
 ## Status
 
