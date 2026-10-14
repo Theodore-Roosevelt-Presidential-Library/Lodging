@@ -4,7 +4,7 @@ name: Refresh lodging availability
 # docs/data/ when something changed.
 #
 # Settings > Secrets and variables > Actions:
-#   Variable  LODGING_SOURCES        comma-separated sources to run, e.g. "google_hotels,trmf,airbnb,vrbo,recgov,ndparks"
+#   Variable  LODGING_SOURCES        comma-separated sources to run, e.g. "google_hotels,trmf,airbnb,vrbo,recgov,ndparks,ics"
 #   Variable  LODGING_PACE           optional: "light" for fewer checks (see README)
 #   Secret    SEARCHAPI_KEY          Google Hotels through SearchApi
 #   Secret    GUESTY_CLIENT_ID       Vacation Medora's Guesty Booking Engine API

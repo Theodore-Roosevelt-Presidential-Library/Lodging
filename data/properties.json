@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-05",
-  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. live.source recgov (facility: the recreation.gov campground number) or ndparks (facilities: the loop numbers in the ND state parks reservation system). units_from lets a property card take its availability from named Airbnb or Vrbo listings tracked under another entry ({entry id: [listing ids]}). first_come true marks a campground that takes no reservations. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
+  "notes": "Hand-maintained list of lodging near the Theodore Roosevelt Presidential Library. Set public to false to hide a property from the widget. dated_url placeholders: {in} and {out} are YYYY-MM-DD; {in_us} and {out_us} are MM/DD/YYYY. live.source names the collector that checks availability: trmf (hotel_id), google_hotels (query key and a distinctive part of the hotel's Google name), guesty (how to assign listings), airbnb (listing IDs), vrbo (map area and IDs to skip), ics (url of a public iCalendar feed of bookings; until = last date the owner takes reservations). Photos: collector/photos.py finds them; photo sets one by hand, photo false shows none, photo_match takes the Google Hotels photo of the result whose name contains the text; photo_search names a Google Maps search to fall back on. live.source recgov (facility: the recreation.gov campground number) or ndparks (facilities: the loop numbers in the ND state parks reservation system). units_from lets a property card take its availability from named Airbnb or Vrbo listings tracked under another entry ({entry id: [listing ids]}). first_come true marks a campground that takes no reservations. type home is a whole house booked directly; cta sets its button label. Rentals: list_units true shows each Airbnb or Vrbo listing as its own card; live.hide lists listing IDs never to show; live.min_rating (default 0.7) leaves out listings whose guest rating is under that share of the scale.",
   "trolley_months": [6, 7, 8, 9],
   "trolley_note": "Months when the free Medora trolley runs (trlibrary.com/visit/trolley: June through September). The widget mentions the trolley only for stays that fall entirely inside these months.",
   "properties": [
@@ -194,6 +194,41 @@
       "public": true
     },
     {
+      "id": "medora-retreat",
+      "photo": "https://a0.muscache.com/im/pictures/hosting/Hosting-1522780397312474727/original/43d3daa0-b7a2-411f-9b22-58a80fa8dc05.jpeg?im_w=720",
+      "name": "The Medora Retreat",
+      "type": "home",
+      "town": "Medora",
+      "area": "medora",
+      "miles": 1,
+      "blurb": "A whole house sleeping up to 16, booked directly with the owners. Two-night minimum.",
+      "season": "Open year-round, by request",
+      "units": 1,
+      "unit_label": "house",
+      "url": "https://docs.google.com/forms/d/e/1FAIpQLSfDWlZsSNMxs7BdEmIrbnNtU5l-DtTch6aOqcGslLDGwVk12g/viewform",
+      "cta": "Request dates",
+      "live": {"source": "ics", "url": "https://calendar.google.com/calendar/ical/e45b885481a9212215856aa2f7dc66015d48c66ae334476bae9dc2e76d68ad96%40group.calendar.google.com/public/basic.ics", "until": "2027-09-30"},
+      "public": true
+    },
+    {
+      "id": "medora-oasis",
+      "photo": "https://images.squarespace-cdn.com/content/v1/6903e0dffe19b372053464ed/a38190b3-b464-4094-aa1a-c6edf30bd0aa/IMG_1871.JPEG",
+      "name": "Medora Oasis",
+      "type": "home",
+      "town": "Medora",
+      "area": "medora",
+      "miles": 2,
+      "direction": "south",
+      "blurb": "A whole house in the Badlands south of town, with a pool, hot tub and fire pit.",
+      "season": "Call or email for season and dates",
+      "units": 1,
+      "unit_label": "house",
+      "url": "https://medoraoasis.com/",
+      "phone": "701-371-0762",
+      "cta": "Contact owners",
+      "public": true
+    },
+    {
       "id": "boots-cabins",
       "units_from": {"vrbo-medora": ["716247", "742272"]},
       "photo": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
@@ -304,7 +339,6 @@
           "1706929444431274600",
           "573921940920496377",
           "1178892400240665803",
-          "1522780397312474727",
           "1688532697492715707",
           "53457764",
           "19661290",

@@ -21,6 +21,8 @@ from the environment. Locally, both come from a .env file in the repo root
     guesty         Guesty Booking Engine API, for an operator who shares credentials. Unused today.
     airbnb         Airbnb listing calendars through Apify, including the Vacation Medora cabins. APIFY_TOKEN.
     vrbo           Vrbo listing calendars through Apify. APIFY_TOKEN.
+    ics            A public iCalendar feed (for example a Google Calendar of bookings) kept by an
+                   owner who takes reservations directly. No key.
 
 Standard library only, so the GitHub Action needs no install step.
 """
@@ -62,8 +64,10 @@ SETTINGS = {
     "recgov": {"horizon": 330, "delay": 10.0, "months": 8},
     # North Dakota state parks: one request per campground loop per three weeks of dates.
     "ndparks": {"horizon": 330, "delay": 2.0},
+    # One request per property: the whole calendar in one file.
+    "ics": {"horizon": 330, "delay": 1.0},
 }
-SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo", "recgov", "ndparks"]
+SOURCE_ORDER = ["trmf", "google_hotels", "guesty", "airbnb", "vrbo", "recgov", "ndparks", "ics"]
 NDPARKS_API = "https://ndparksrdr.usedirect.com/rdr/rdr"
 # A small Apify scraper that reads recreation.gov month by month, so the requests come from Apify
 # rather than from this collector. Set RECGOV_VIA=direct to ask recreation.gov directly instead.
@@ -78,7 +82,7 @@ PACE = {
     "light": {
         "trmf": [(14, 1), (60, 7), (None, 14)],
         "airbnb": 3, "vrbo": 3, "guesty": 3,
-        "recgov": 2, "ndparks": 2,
+        "recgov": 2, "ndparks": 2, "ics": 2,
     },
 }
 RECGOV_ENDPOINT = "https://www.recreation.gov/api/camps/availability/campground/{facility}/month?start_date={month}-01T00%3A00%3A00.000Z"
@@ -159,6 +163,19 @@ def http_json(method: str, url: str, headers: dict | None = None, json_body=None
         return json.loads(raw.decode("utf-8")) if raw else None
     except json.JSONDecodeError:
         raise HttpError(f"{host} did not return JSON") from None
+
+
+def http_text(url: str) -> str:
+    """One GET returning the body as text. Errors name the host only, never the URL."""
+    host = urllib.parse.urlsplit(url).netloc
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "text/calendar, text/plain;q=0.8, */*;q=0.5"})
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
+            return resp.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as exc:
+        raise HttpError(f"HTTP {exc.code} from {host}") from None
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        raise HttpError(f"could not reach {host}: {getattr(exc, 'reason', exc)}") from None
 
 
 def norm(text: str) -> str:
@@ -884,8 +901,85 @@ def collect_ndparks(run: Run, props: list[dict]) -> None:
             run.mark("ndparks", night)
 
 
+# --------------------------------------------------------------------------- ics (public calendar feeds)
+
+def parse_ics(text: str) -> list[tuple[dt.date, dt.date]]:
+    """(first night, check-out day) for every booking in an iCalendar file.
+
+    All-day events give their dates directly. Timed events use the UTC date: owners enter stays as
+    midnight-to-midnight in a US zone, and 05:00Z to 07:00Z is still the same UTC day. Cancelled
+    and free (TRANSPARENT) events are skipped. DTEND is exclusive, as the standard says.
+    """
+    lines, out = [], []
+    for raw in text.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        if raw[:1] in (" ", "\t") and lines:
+            lines[-1] += raw[1:]   # folded continuation line
+        else:
+            lines.append(raw)
+    event = None
+    for line in lines:
+        if line == "BEGIN:VEVENT":
+            event = {}
+        elif line == "END:VEVENT":
+            if event is not None and "start" in event and event.get("status", "").upper() != "CANCELLED" \
+                    and event.get("transp", "").upper() != "TRANSPARENT":
+                start = event["start"]
+                end = event.get("end") or start + dt.timedelta(days=1)
+                if end <= start:
+                    end = start + dt.timedelta(days=1)
+                out.append((start, end))
+            event = None
+        elif event is not None and ":" in line:
+            key, value = line.split(":", 1)
+            name = key.split(";")[0].upper()
+            if name in ("DTSTART", "DTEND"):
+                m = re.match(r"(\d{4})(\d{2})(\d{2})", value.strip())
+                if m:
+                    event["start" if name == "DTSTART" else "end"] = dt.date(int(m[1]), int(m[2]), int(m[3]))
+            elif name == "STATUS":
+                event["status"] = value.strip()
+            elif name == "TRANSP":
+                event["transp"] = value.strip()
+    return out
+
+
+def collect_ics(run: Run, props: list[dict]) -> None:
+    """A whole house or a few units whose owner keeps a public calendar of bookings.
+
+    live: {"source": "ics", "url": "...basic.ics", "until": "2027-09-30"}. A night inside a booking is
+    full; any other night up to "until" (the last date the owner is taking reservations, optional) is
+    open. Nights past "until" are left unknown, so the card says to check directly.
+    """
+    stat, cfg = run.stat("ics"), SETTINGS["ics"]
+    complete = True
+    for prop in props:
+        stat["requests"] += 1
+        try:
+            bookings = parse_ics(http_text(prop["live"]["url"]))
+        except HttpError as exc:
+            stat["failed"] += 1
+            complete = False
+            print(f"  ics {prop['id']}: {exc}", file=sys.stderr)
+            continue
+        busy = set()
+        for start, end in bookings:
+            for i in range((end - start).days):
+                busy.add((start + dt.timedelta(days=i)).isoformat())
+        until = str(prop["live"].get("until") or "")
+        for night in run.horizon("ics"):
+            if until and night > until:
+                run.put(night, prop["id"], None)
+            else:
+                run.put(night, prop["id"], {"a": 0} if night in busy else {"a": 1})
+        run.sleep(cfg["delay"])
+    if complete:
+        for night in run.horizon("ics"):
+            run.mark("ics", night)
+
+
 SOURCES = {"trmf": collect_trmf, "google_hotels": collect_google_hotels, "guesty": collect_guesty,
-           "airbnb": collect_airbnb, "vrbo": collect_vrbo, "recgov": collect_recgov, "ndparks": collect_ndparks}
+           "airbnb": collect_airbnb, "vrbo": collect_vrbo, "recgov": collect_recgov, "ndparks": collect_ndparks,
+           "ics": collect_ics}
 
 
 # --------------------------------------------------------------------------- connection check
@@ -943,6 +1037,11 @@ def check(run: Run, source: str, props: list[dict]) -> None:
         known = [n for n, r in sorted(nights.items()) if r and n >= run.stamp]
         print(f"  {props[0]['name']}: {len(nights)} nights this month, {sum(1 for r in nights.values() if r and r['a'])} with open sites"
               + (f"; next open or full night {known[0]}" if known else ""))
+    elif source == "ics":
+        bookings = parse_ics(http_text(props[0]["live"]["url"]))
+        ahead = sorted(b for b in bookings if b[1] > run.today)
+        print(f"  {props[0]['name']}: {len(bookings)} bookings in the feed, {len(ahead)} still ahead"
+              + (f"; next {ahead[0][0]} to {ahead[0][1]}" if ahead else ""))
     elif source == "vrbo":
         live = props[0]["live"]
         items = apify_run(APIFY_VRBO_ACTOR, {"startUrls": list(live.get("start", [])), "scrapeAvailability": True,

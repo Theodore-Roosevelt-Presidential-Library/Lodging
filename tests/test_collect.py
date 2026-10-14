@@ -582,6 +582,54 @@ class NdParks(Sandbox):
         self.assertEqual(len(self.calls), 2)                                                  # one request per loop: booking window reached
 
 
+# ----------------------------------------------------------------------------- ics (public calendar feeds)
+
+ICS = (
+    "BEGIN:VCALENDAR\r\nX-WR-TIMEZONE:America/Denver\r\n"
+    "BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261007\r\nDTEND;VALUE=DATE:20261010\r\nSUMMARY:Busy\r\nEND:VEVENT\r\n"          # all-day: nights 7, 8, 9
+    "BEGIN:VEVENT\r\nDTSTART:20261021T050000Z\r\nDTEND:20261023T050000Z\r\nSUMMARY:Bu\r\n sy\r\nEND:VEVENT\r\n"    # timed at US midnight; folded line
+    "BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261101\r\nDTEND;VALUE=DATE:20261103\r\nSTATUS:CANCELLED\r\nEND:VEVENT\r\n"  # cancelled: ignored
+    "BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20261201\r\nSUMMARY:Busy\r\nEND:VEVENT\r\n"                                     # no DTEND: one night
+    "END:VCALENDAR\r\n")
+
+
+class IcsParse(unittest.TestCase):
+    def test_events(self):
+        import datetime as dt
+        self.assertEqual(collect.parse_ics(ICS), [
+            (dt.date(2026, 10, 7), dt.date(2026, 10, 10)), (dt.date(2026, 10, 21), dt.date(2026, 10, 23)),
+            (dt.date(2026, 12, 1), dt.date(2026, 12, 2))])
+
+
+class Ics(Sandbox):
+    PROPS = [{"id": "house", "name": "A House", "type": "home", "units": 1, "public": True,
+              "live": {"source": "ics", "url": "https://calendar.example/basic.ics", "until": "2026-12-15"}}]
+
+    def setUp(self):
+        super().setUp()
+        self._text = collect.http_text
+        collect.http_text = lambda url: ICS
+
+    def tearDown(self):
+        collect.http_text = self._text
+        super().tearDown()
+
+    def test_booked_nights_are_full_and_the_rest_open_until_the_owner_stops_taking_dates(self):
+        collect.run(args(sources="ics"), today=TODAY, sleep=lambda s: None, env={})
+        out = self.out()
+        nights = out["nights"]
+        self.assertEqual(nights["2026-10-05"]["house"], {"a": 1, "t": "2026-10-05"})
+        self.assertEqual(nights["2026-10-09"]["house"], {"a": 0, "t": "2026-10-05"})   # last night of the all-day booking
+        self.assertEqual(nights["2026-10-10"]["house"], {"a": 1, "t": "2026-10-05"})   # check-out day is open
+        self.assertEqual(nights["2026-10-22"]["house"], {"a": 0, "t": "2026-10-05"})   # timed event, second night
+        self.assertEqual(nights["2026-10-23"]["house"], {"a": 1, "t": "2026-10-05"})
+        self.assertEqual(nights["2026-11-01"]["house"], {"a": 1, "t": "2026-10-05"})   # cancelled booking
+        self.assertEqual(nights["2026-12-01"]["house"], {"a": 0, "t": "2026-10-05"})
+        self.assertNotIn("house", nights.get("2026-12-16", {}))                        # past "until": unknown
+        self.assertTrue(out["sources"]["ics"]["ok"])
+        self.assertEqual(out["checked"]["ics"]["2026-10-05"], "2026-10-05")
+
+
 # ----------------------------------------------------------------------------- pace, side-by-side runs, time budget
 
 class Pace(Sandbox):

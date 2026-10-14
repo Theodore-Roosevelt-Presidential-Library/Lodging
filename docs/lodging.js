@@ -44,7 +44,7 @@
     { key: 'cabin', label: 'Cabins and rentals' },
     { key: 'camping', label: 'Camping and RV' }
   ];
-  var TYPE_NAME = { hotel: 'Hotel or inn', cabin: 'Cabin or ranch stay', rentals: 'Vacation rentals', camping: 'Camping and RV' };
+  var TYPE_NAME = { hotel: 'Hotel or inn', cabin: 'Cabin or ranch stay', home: 'Vacation home', rentals: 'Vacation rentals', camping: 'Camping and RV' };
   // One tab per group of places. Only one group shows at a time, so nothing needs a long scroll.
   var TABS = [
     { key: 'medora', label: 'Medora', intro: 'Hotels, cabins and campgrounds in and around Medora.',
@@ -67,6 +67,7 @@
     hotel: 'M3 19v-8h18v8M3 15h18M6 11V7h5v4M3 19v1.5M21 19v1.5',
     cabin: 'M3.5 11.5 12 5l8.5 6.5M6 10v9h12v-9M10 19v-5h4v5',
     rentals: 'M3.5 11.5 12 5l8.5 6.5M6 10v9h12v-9M10 19v-5h4v5',
+    home: 'M3.5 11.5 12 5l8.5 6.5M6 10v9h12v-9M10 19v-5h4v5',
     camping: 'M2.5 19 12 5l9.5 14zM12 5v14M9 19l3-5 3 5'
   };
 
@@ -346,7 +347,7 @@
 
   function matchesType(p) {
     if (state.type === 'all') return true;
-    if (state.type === 'cabin') return p.type === 'cabin' || p.type === 'rentals';
+    if (state.type === 'cabin') return p.type === 'cabin' || p.type === 'home' || p.type === 'rentals';
     return p.type === state.type;
   }
 
@@ -363,24 +364,25 @@
     var label;
     if (ev.status === 'available') {
       c.section = 'open';
-      c.headline = p.type === 'camping' ? 'Sites available' : 'Rooms available';
+      // A whole house booked as one unit is simply available; hotels and cabins have rooms open.
+      c.headline = p.type === 'camping' ? 'Sites available' : (p.units === 1 ? 'Available' : 'Rooms available');
       c.fine = cap(checkedText(ev.checked));
       if (ev.count) {
         c.headline = plural(ev.count, p.type === 'rentals' ? 'rental' : 'unit', p.type === 'rentals' ? 'rentals' : 'units') + ' available';
         c.fine += ' · ' + ev.count + ' of ' + ev.of + ' tracked' + (p.type === 'rentals' ? '; more may be listed' : '');
       }
-      label = p.type === 'rentals' ? 'See rentals' : 'Book';
+      label = p.type === 'rentals' ? 'See rentals' : (p.cta || 'Book');
     } else if (ev.status === 'unavailable') {
       c.section = 'closed';
-      c.headline = 'Full or closed';
+      c.headline = p.units === 1 ? 'Booked on these dates' : 'Full or closed';
       c.fine = [p.season, ev.checked ? cap(checkedText(ev.checked)) : null].filter(Boolean).join(' · ');
-      label = p.type === 'rentals' ? 'See rentals' : 'Website';
+      label = p.type === 'rentals' ? 'See rentals' : (p.cta || 'Website');
       c.quiet = true;
     } else {
       c.section = 'check';
       c.headline = p.first_come ? 'First come, first served' : (link ? 'Check dates directly' : 'Call to check dates');
       c.fine = p.season || '';
-      label = p.type === 'rentals' ? 'See rentals' : (p.dated_url && !p.first_come ? 'Check dates' : 'Website');
+      label = p.type === 'rentals' ? 'See rentals' : (p.cta || (p.dated_url && !p.first_come ? 'Check dates' : 'Website'));
     }
     if (link) {
       c.actions.push({ href: link, label: label, aria: label + ': ' + p.name + ' (opens in a new tab)' });

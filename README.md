@@ -104,6 +104,7 @@ Sources are switched on with `LODGING_SOURCES` (comma-separated) and read their 
 | `airbnb` | 15 known Airbnb listings around Medora, shown as one count; plus the Vacation Medora cabins that are on Airbnb (2 at Boots, 6 at The Crossings) | `APIFY_TOKEN` | Tested live Oct 5 |
 | `guesty` | Nothing today. Kept for any operator who shares Guesty Booking Engine API credentials | `GUESTY_CLIENT_ID`, `GUESTY_CLIENT_SECRET` | Written from Guesty's documentation; unused |
 | `vrbo` | Vrbo listings in a map area around Medora, shown as one count | `APIFY_TOKEN` | Tested live Oct 5 |
+| `ics` | The Medora Retreat (a whole house booked directly with its owners, who publish a Google Calendar of bookings) | Nothing | Tested live Oct 14 |
 
 How each reads availability:
 
@@ -112,6 +113,7 @@ How each reads availability:
 - **ndparks**: one request per campground loop per three weeks of dates, about 20 a run. A night is open when at least one bookable site is free. Tonight is never called full, because walk-up sites cannot be seen.
 - **recgov**: by default one run of the Apify scraper `hikemetrics/recreation-gov-permit-tracker` covering eight months for each campground, so the requests come from Apify. With `RECGOV_VIA=direct` the collector asks recreation.gov itself: one request per campground per month, ten seconds apart. Either way a night is open when at least one site is "Available", full when every bookable site is taken or closed, and unknown when booking has not opened yet (recreation.gov releases dates about six months ahead) or the campground is in its walk-up season.
 - **guesty**, **airbnb**, **vrbo**: read each listing's calendar for the whole horizon in one pass per day. The widget counts a cabin or rental only if it is open every night of the stay.
+- **ics**: one request per property for a public iCalendar feed (`live.url`, for example a Google Calendar's `.../public/basic.ics`). A night inside a booking is full; every other night is open, up to `live.until`, the last date the owner is taking reservations (nights past it are unknown). Any owner who takes bookings directly and keeps a public calendar can be added this way, with no key.
 
 Rates returned by these services are discarded; nothing price-related is written to `docs/data/`.
 
