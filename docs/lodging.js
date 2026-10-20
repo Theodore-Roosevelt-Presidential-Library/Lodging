@@ -9,7 +9,8 @@
  *   data-heading="off"       hide the built-in heading (when the page has its own)
  *   data-area="medora"       show only Medora-area lodging
  *   data-photos="off"        never show photos
- *   data-url="on"            keep the chosen dates, tab and filter in the page address, so the view can be shared
+ *   data-url="off"           do not keep the chosen dates, tab and filter in the page address (on by default,
+ *                            so any view a visitor picks can be copied from the address bar and shared)
  *   data-fonts="off"         do not load the brand fonts (they are loaded from trlibrary.com on any other site)
  *   data-sticky-top="94"     pixels to leave above the pinned tab bar (default: measured from the page's own fixed header)
  *
@@ -317,6 +318,9 @@
   // ---------- cards ----------
   var state = { checkin: addDays(today(), 14), nights: 1, type: 'all', tab: null, place: null };
   var PARAMS = ['checkin', 'nights', 'tab', 'type', 'place'];
+  // The address is only rewritten once it names a view or the visitor changes something, so a plain
+  // visit to the page keeps a clean address.
+  var touched = false;
 
   // Open on the view named in the page address, if any.
   (function readAddress() {
@@ -328,10 +332,11 @@
     if (TYPES.some(function (t) { return t.key === type; })) state.type = type;
     if (TABS.some(function (t) { return t.key === tab; })) state.tab = tab;
     state.place = q.get('place') || null;
+    touched = PARAMS.some(function (k) { return q.has(k); });
   })();
 
   function writeAddress() {
-    if (opts.url !== 'on' || !window.history || !history.replaceState) return;
+    if (opts.url === 'off' || !touched || !window.history || !history.replaceState) return;
     try {
       var q = new URLSearchParams(location.search);
       PARAMS.forEach(function (k) { q.delete(k); });
@@ -595,6 +600,8 @@
 
   // Switch tabs. If the bar is pinned, bring the top of the new panel up under it.
   function pick(key, focus) {
+    if (key !== state.tab) state.place = null;   // the outlined card belongs to the old tab
+    touched = true;
     state.tab = key;
     drawTabs();
     drawPanel();
@@ -639,15 +646,17 @@
   function controls() {
     var min = today();
     var date = h('input', { type: 'date', id: 'ci', value: state.checkin, min: min, max: addDays(min, (DATA && DATA.horizon_nights) || 330) });
-    date.addEventListener('change', function () { if (date.value && date.value >= min) { state.checkin = date.value; render(); } });
+    date.addEventListener('change', function () { if (date.value && date.value >= min) { state.checkin = date.value; touched = true; render(); } });
     var nights = h('select', { id: 'nt' });
     for (var i = 1; i <= MAX_NIGHTS; i++) nights.appendChild(h('option', { value: i, text: plural(i, 'night', 'nights') }));
     nights.value = String(state.nights);
-    nights.addEventListener('change', function () { state.nights = +nights.value; render(); });
+    nights.addEventListener('change', function () { state.nights = +nights.value; touched = true; render(); });
     var chips = TYPES.map(function (t) {
       var b = h('button', { type: 'button', class: 'chip', 'aria-pressed': String(t.key === state.type), text: t.label });
       b.addEventListener('click', function () {
         state.type = t.key;
+        state.place = null;
+        touched = true;
         chips.forEach(function (c, j) { c.setAttribute('aria-pressed', String(TYPES[j].key === t.key)); });
         render();
       });

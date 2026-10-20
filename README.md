@@ -18,7 +18,7 @@ Optional attributes on the script tag:
 | `data-area="medora"` | Shows only Medora-area lodging (`medora`, `nearby` or `dickinson`) |
 | `data-photos="off"` | Never shows photos |
 | `data-fonts="off"` | Does not load the brand fonts |
-| `data-url="on"` | Keeps the chosen dates, tab and filter in the page address, so a view can be copied and shared. On for the preview page |
+| `data-url="off"` | Stops the finder from keeping the chosen dates, tab and filter in the page address. Without it (the default), every change a visitor makes updates the address of the page the finder sits on, so a view can be copied and shared |
 | `data-sticky-top="94"` | Pixels to leave above the pinned tab bar. By default the widget measures the page's own fixed header and sits just below it |
 
 The widget renders in a shadow root, so page styles do not leak in or out.
