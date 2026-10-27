@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-21T11:53:10Z",
+ "generated_at": "2026-10-27T11:48:38Z",
  "note": "Images published by each property's own website or listing (or, failing that, the one Google shows for it), displayed from their servers. Not stored here.",
  "photos": {
   "amble-inn": {
@@ -10,25 +10,25 @@
    "checked": "2026-10-21"
   },
   "americinn-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeM9EdtrSuxUQTr18NODBpzny5jG_UviPclWB1ua5uSO4qYTEXQjSFxQs8ZmJqKiDh4YLFP0FoHqPw40YS2elax-onLzYyJmMhwHobgGpxdama_JbM1xvStoJfJzJi5IgYet4jcfxr-uunv=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdnAVcm4aqYuKqjBzzp8aoeuATPBbYSusAgwZUGK2M_2vqoqGu84-kWvw4Rwk9bajcWUNq40O00a7kps68hwWgziLgm7to1SuorKkeJ1lWpJr0haWTgE-r--_c0R5E6ujEUmLZoUcmvv_qc=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "americinn-medora": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcKJgEqaWjdpjL5oco4-mvhnIzxsM-GPWhTEBDE26se9X40uuQvEQmILiO0CLWdCiz7q7eH34kmx7qVVEiSBNLumeJ19aJty3sQgxTTOi45KNUpkBcYckSTzMbzo4SBdmlWUvBh6_X40jmb=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcjKZ_MyemA0hE8OEkS1Aq65uveTLCVMZmQzFIId8vZ08Yh2iC2JdbimuWsPiWaRVGXG8-aJQNQtmLCBbBtF7mar9HujUyzTB17_A0Lp4xMQ2erjHQiobV0GY3ZXLfEwb4myVDvUvV-H1In=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "astoria-hotel": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcBApLqhlSTaKho-4yhImmPSsFqu2UgHeAJa3b6pIOUbHoidJ0tmWK5J2MM03Y-AmGhMW2OyqS3PjuCjCcQTJuUB7E3v_4KI0GSDx6ViQDgoK-_u_MrELxRBZbP-DQPbKXqqnTK=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdOLS3SmLCBmZ7u71dtzXoH1Gctcf8Utsm3qCPxgWGXGMQHded8CaJVXmuiCQ4vjAaT1Oev8oCvN2bRTHeIhLz7ijdwbjK45cDSoywd5jSazM9bRoQj4HawatHoVIVVROuEKNCL=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "badlands-motel": {
    "src": "https://medora.com/wp-content/uploads/2022/11/Badlands-Single-Bedroom-11-scaled.jpg",
@@ -36,7 +36,7 @@
    "h": 1707,
    "page": "https://medora.com/badlandsmotel/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "bar-x-guest-ranch": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdjD1z79Fyr9RHMAsBdZuBIhJB_aPbvbZsKpWslGn389nOQDcb5SD5lxWwiuCqL_0zB02vY_weZBJcfnOyy61p3_SB39cJhq39kr2axzJLhqgrONvz2uScm9OaVzsOq0vp27VHZ=w640-h360-n-k-no",
@@ -46,11 +46,12 @@
    "checked": "2026-10-21"
   },
   "baymont-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe1Nu4zDNDsiGBBxDUetjkJ0xiLsTB6bUX_J_4eTO3M26mi9_NculMEJD9GNDXyQ0O8g2zefVDNj_n3sIbrtyariHaT5gUKpm0II1_ww1DRv8KznRBUeXHHIUAz0hXy6lZMulQUtH5X7pww=w640-h360-n-k-no",
-   "w": 640,
-   "h": 360,
-   "from": "google",
-   "checked": "2026-10-20"
+   "src": "https://www.wyndhamhotels.com/content/dam/assets/clientlibs/baymont/graphics/BU_generic_propertyimg.jpg",
+   "w": 1230,
+   "h": 820,
+   "page": "https://www.wyndhamhotels.com/baymont/dickinson-north-dakota/baymont-dickinson/overview",
+   "from": "preview",
+   "checked": "2026-10-27"
   },
   "boots-cabins": {
    "src": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
@@ -72,11 +73,12 @@
    "checked": "2026-10-21"
   },
   "buffalo-gap-guest-ranch": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1Q2h7tlsTKU9DGZJKcpohrgag3VMuAB9orCoD310_79EoHR_-B1MtSv4wduab1l9kXOOlJb4L7ImJHVu9_Ppc_yVllQ1WXfLKPzxVLa7VAdez8TxfcKx2Y3DywEprf8zOVcKAbNr6BSoCiQCT-sS3Qr_TZbK6GGxf6GN96xwMhKI_vkevS_7HnGg=w640-h360-n-k-no",
-   "w": 640,
-   "h": 360,
-   "from": "google",
-   "checked": "2026-10-21"
+   "src": "https://buffalogapguestranch.com//wp-content/uploads/2015/09/BGGR-Rooms-2.jpg",
+   "w": 1000,
+   "h": 714,
+   "page": "https://buffalogapguestranch.com/the-lodge/",
+   "from": "page",
+   "checked": "2026-10-27"
   },
   "camp-on-the-heart": {
    "src": "https://lh3.googleusercontent.com/grass-cs/ACvplmPcV8zLtmk2oMv9h5y_PwTYO5r74_uvF7rxeulF1sGGcY8JPGkawhsXxi08ItGy7Bs1FD6xjH9s6KvU2J0zEx87sQewUuwnINW0iDsmPgRTuk5FUYX9QOZSXSBFVU8Mj50cEfX1=w640-h360-n-k-no",
@@ -87,11 +89,11 @@
    "checked": "2026-10-21"
   },
   "candlewood-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLefvJoBqV3DQ035VJy4jCOdGS_DjzR_LtkdSN1JWLYtIX_QEaHyMLVURFl5gh4urtOR4fx6LBZaYM4PVo9M3LSoBrAWpO3eyOXjXiom8laoMEA32e1ovbfg-jhITG4jKGHp2Wh-=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe-J9Oln-javSCMH9kxu7Qefb_Sm88KQF-hw87JrRb2PxEsyss7-F-JwEAARoIVNgi2oiOql0CfYT-9OdhZIHJKGQTpXwRpE7YS-6wlb-VDnL0VwXQcFG7rzTc6tOgipPQNGQ_u=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "coal-creek-campground": {
    "src": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlShi-k21T1mnyNJrtcustmKQ10WV0i3qHQ7majEGatUgjOt9qh9nRSNfa-tlrzGq3PwGSBO3AF29gjcqbbwxVF4aB-SZlPJXHGXV249RFJqXYPj-yI6b7coAV_ARPUBRqP6kjRMw=w640-h360-n-k-no",
@@ -102,11 +104,11 @@
    "checked": "2026-10-21"
   },
   "comfort-inn-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeNdeQrPqmXphpgNBuDyuSr8Jhk2saghLNSwzJpFTHwgNWaLJqU__19y2BHRyOjzRfQpIcGv1Bttm9v2Nd81vN4jGoUbRQpXi0ttv3eoTyOdswfWR9LVdV98cVjQvSIjAyqkZUCXw=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe1KudC-I4TEYxHz_wF-QaiEBveBzDooHhUdOLZrc1ACEReOvAH8IN_ZgiUWwKQd4iMEbHLXoEhrrTe3LALh6tVuPyRSA-a924KjHhfzGeKFSBTKJATkAXJj_nyEL-NBe6EsHT-jw=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "cottonwood-campground": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfHF5kxvlg6OTIgcYDPe6MHmYJqK0dfny5K58uS0zmsdDjg1meFoWs4oLSNALI5c_KkqhDGboXHENrPi5i7NLI7hHwQ2W3UEQhI-68evK-Fm8cFXlEeX4ZFKx-t_4xEp175bkTq=w640-h360-n-k-no",
@@ -142,11 +144,11 @@
    "checked": "2026-10-21"
   },
   "dakota-place-lodge": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdrJAivdVMPZJmT9kU4qrmXDq6AqpznzxVcCaK1MR_vMHobfhrcqtO36JVi0FCnJO81yLmHaKdeqTHERGGx7yZ9PXVAb9vekTmZ7b8MYKVKyAtp6q1M3yhuNOEdXMeCQL1yfv22=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdmOygFyXmsgtGXp9Kk2Um0Sc5fyPYr9iOHv5S8qWruKandjlNEwCH9-nom4rtWYnRvGlk2UB75m2_R0v8Escf231J2pr_hOX_pOclYra1_qpFpc8mzVGiia1a1s2sqcp00TmM6=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "dickinson-inn": {
    "src": "https://img1.wsimg.com/isteam/ip/c0cec538-3fce-4588-b80c-4cf703875a02/Dickinson.jpg",
@@ -154,7 +156,7 @@
    "h": 500,
    "page": "https://dickinsoninn.com/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "dry-creek-hideaway": {
    "src": "https://lh3.googleusercontent.com/gps-cs-s/ANWiy9TON2G2zsKSCt1fF_HokbQmVCkM5cJxg9ghBPTO-aZ8Xvh92OwzS7X_annXyIRMfQJbleWjhVEc7y-Rcul7Hu0SyDG4DRpxIY-Q0johwxMr6TlgjRQWxvsMQA4ZjmkTaUPx5xcIFLUaNCV7=w640-h360-n-k-no",
@@ -170,21 +172,21 @@
    "h": 534,
    "page": "https://medora.com/elkhornquarters/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "hampton-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLci91WKBHi9zyGkMuJILA9H7vGrwPqIgWSb2ZZWc_aLNzmEgx-FOY8t5cLv4aDriGgTu5o3Bn0Ez4iJ7WOZuYXw-JJonCGVY7oq1DgOCZPWgKuzO8K07LzRi08FEF9ALetmUXaCqbULwM8c=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLey2XvwAuAmNfPW7wLtcM5O39f9vJLyYoF0LhI5XMgTzyL-lroW5lTKJp9wbP6scG4CRBuJWafUkdvurNHAXOV50ROMTlC6yu2LG3HNt79vf8JujwRja5lrRrNboAmG7UODcBUxtXCIQm-D=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "hawthorn-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLd57LtH168xH3LD9yCchedRdepHA4zZ9vw-ofxB2L3MqyKtU49k-S46Sc-BtDNlUPPHjX0Yk4JscMe-RXdmuFzzjLel7Rbmof3SiS1lv3j88rhwfCl0DN9G-K5qz4mrkCnygrmqLKKYCjzY=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeubUwZa5KGotNcpUdzghfNbpsRj5Ijcw9Via4KijkHOdyOBa50A6203qC9pfMugEhsOan8vRM-QmN4gWIQqDSsLhCQKdgXtGpjOgmKsmvhRAj61K8oiVw8a1ByAtCfzI-lo2z_wCjMsMEn=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "heritage-hotel": {
    "src": "https://www.heritagehotel.co/images/home/king-bed-1.webp",
@@ -192,21 +194,21 @@
    "h": 590,
    "page": "https://heritagehotel.co/",
    "from": "page",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "hie-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcAJpV9wGyOz2F3DY6-kObWktM5s7snAMlLpJYZnlNVyIOLB9ecXEwJobtIfGPUW-_xrCH22T8hOiQrp5BYWaJw5REmdZTdxq3PcuCsQmtKh2XBGJdSlhb1VkTFhlzJ6TqZgDQVag=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdHMDyVSuatbZOQ7KUDWpkI91xiHtYBy4Lu0Nt1pQVMgcRkBlxvuygxDZPfQFna-2eAYDitUokWNnjuh867XipI9dcuL4sIoALZDv0CwC7gWSNCwnP6n07TaEQ8gFUxJ6GAByb8pw=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "hotel-1883": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLd78vrvgNsRoPwwqvBvRg0eDelk2qG63jRPQuK41wQgznxqfduKGVayKXqCDGPvgSlG4OtvbOYTyvrtZnfLeEa-X93Ag5RO6Xz7aczt9qWCyCuk0snynQ8TaUknIOoRmE5W34N7Ipv6Oog=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeeTCWam1ZmPghubYTO7MsGSZYHBq6NNe56XooJWK1M9FI9LH_gsJq_tpT9i_xZRXREo9TGyhlZkpmXBr9fdXA3Owd7NZkmXpk0LA24CLJvaZOyEXTF1hi3y-U16AmfQisOAVVXmPSbkC8=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "kings-guest-ranch": {
    "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3-3gvEbMX4P40PLaAxBz2pb7pAyWUzuVZJsJ1bPcTif78UZFjsjyLiXWatSAiCBGNVddTjIRKYJin1rGnzd2pQrAZq6s_Yw9yxbsDUNJc5MluJOOIU3MSwTtXVjCYvRGNOzyf0yd_ARrPnHwxHkXZHeQHTYy0Iio_GyNMVGRisqwFUTr42e2pLRA=w640-h360-n-k-no",
@@ -216,11 +218,11 @@
    "checked": "2026-10-21"
   },
   "la-quinta-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcc4Yxe4QMzFxe8Xghmcy3u0Taj9AZEmKQYL46yJLaf-Ab-Kbtw_SP9YMw5IF7nUvBpdFpTTI-dLIZ4vRvkjinu11yiNPw88aHI-PkpkynVr89fQl0YO3HlViBeG1wlaZjSKiByK5rFnMI=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcUSkYO668dIlnMCdIGM3b_UCPgezhGqZgBzUeEBG9K9_JScKsDIceVIPyVwQq4dmrrtn7-jcndBnBrbODmOo0aTENfzCBeguxXah_C7-zTbECjwJHM-tltV7LhFGywrNrQ2ppmI7BROCM=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "medora-campground": {
    "src": "https://medora.com/wp-content/uploads/2024/04/Campground-MC-RV-Feature-2.jpg",
@@ -228,7 +230,7 @@
    "h": 720,
    "page": "https://medora.com/medoracampground/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "medora-oasis": {
    "src": "https://images.squarespace-cdn.com/content/v1/6903e0dffe19b372053464ed/a38190b3-b464-4094-aa1a-c6edf30bd0aa/IMG_1871.JPEG",
@@ -241,11 +243,11 @@
    "checked": "2026-10-14"
   },
   "microtel-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfQurAKlPjxJFFC4eUytToaBgG1mUpUv5h7VizDg8uRnr-nwR2ndUjd-Zvn_TR7CWEMGvW-48_K0eYX2RiYIrNfH3quCmksSgLOOfSgIJKn47wtPnwnQBcvaaq7De0bLyx-HduJohdj0L_c=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfiWPtkkXuEpRXUyvKdDaKW6DSsI6l1-vZGCScg-6UYp0oSctWC8nFUjwRMKoAsXve_kARfuhjBJU7Rd5wVwyekVbal1hypjEw_DSb9-UkO3X1t0zId02XiD04oINhVnxUKsrg5-sL-_qEy=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "my-place-dickinson": {
    "src": "https://d1nuhzf7j09t95.cloudfront.net/generalUploads/Exterior-Location-Photos/North-Dakota/Dickinson-ND-DIC/MPHOA_CR_Gallery-1200x700_DIC2.jpg?mode=crop&pos=center-center&w=1200&h=630&q=82&c=ebaf3c1f&v=1dc812b0a13aa1c053041529797dbb8c698ff56c2c83870e34b59a07feb41b17",
@@ -253,7 +255,7 @@
    "h": 630,
    "page": "https://www.myplacehotels.com/my-place-hotel-dickinson-nd",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "north-park-campground": {
    "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW0QnAD4tly6ehiOGZpgiAg3QlxfZrAnwvBTYI8uO0pk39z-jhTlLwlXgYjvk3b9_3JlCnNrIwJzXelajNn7Bx3_Lo9PE97xqqak_RHH_n_DptyXRfpDvGPjVbJI_-L2UhKsmX_W9Ivi1gBue-EpDkrYTMJxSOl8TCJRjUkInnZd9kOuRcEoJJTy=w640-h360-n-k-no",
@@ -277,14 +279,14 @@
    "h": 630,
    "page": "https://www.pheasantgrovecampground.com/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "red-roof-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLevVzuxuQnYTTbxKwHpM6zRS8cfKj2N8SuZVdJ5lMzmcYnYQd7fZ_I1oYjl0Ahm-EbGagrETAl1Ogz6vNRGyqxobVVNpx9cgoaxXegnZhEgIQl_iJ1S2CyZrxtmC0sWhuIPewv9=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeoHaFLKJR3MJXCj7Ggl5k7kuQi37r5OnR_e6M8eJEIZEowepYF-E6kF-Qt-XyJqXDETi0wlm9nXhg-2xW2XKBe0rgGUU2CWkuTOPfCelpiRBYyPhw9IVwd3xBoZeJ1lL15g8up=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "red-trail-campground": {
    "src": "https://img1.wsimg.com/isteam/ip/fdbf8907-aae2-4cc0-991e-2d7943f2bf38/blob-0010.png/:/cr=t:0%25,l:0%25,w:100%25,h:100%25/rs=h:1000,cg:true",
@@ -295,11 +297,11 @@
    "checked": "2026-10-21"
   },
   "roosevelt-grand-dakota": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdwjyYiqUy38_05V18-HlsjX_GV1b27BW4nzN4ELdnehnYcGuJ6_WqerMG1qQYDVNOxU9W3LHbzDFq2Lig4mp2d2gWXrk009Zm5CPbgtnufgiF6McC9ULDgtM59cp-XHS0Fl8H5elzcq6wv=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeTZnQViTkhLRtKMBK5iqfGmu6u2GlEYNx8lEDo51j7g877cL3WujZgHUxQuxxdfamuwj_Lz7Rnul0zRss9WjDtZoYTKlI5YHKuUMAn7SxtagFCdpAgKj1ZF7bMARh7YxihZjJ4-VT-oI4k=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "rough-rider-state-park": {
    "src": "https://lh3.googleusercontent.com/grass-cs/ACvplmMVH51uA7pCKYYdXsXEDwEgZd1O76KLGX-lTVUmcc2b6RyQ9GTfiEGJFyo3beBFi9RnPtMDKjprCsX1VfKwP0Gx7-noq6qdszUTz7pMfg0DDZ_GdG0nuwNM3qwQ9FneUtkafGZK=w640-h360-n-k-no",
@@ -323,18 +325,18 @@
    "checked": "2026-10-21"
   },
   "spirit-of-the-badlands": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW0qeLFrSvlhk52cl58FWQ1591OpBB0sUbA86vJcFoyRmmykCE-3IaHLzKeyGnBytuTrO_s3dWZw03M3o2hvMOVURiLWIbJextb-NlGlCgxh0dOSD14LeAv47Jb6JVU3Fs79gS2JPBkdQbIhRCrnLdTubhmTt9CzntAcyRagh2CNuZTqIvqGZCXAJA=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2j6G_9Zxtbb0nUZeKat6rbQYh64TwKXZGjDfmsE6VxsL-Vw8OBKxlQF-6JycSbbzllHIz0dvRx5WQDYpk1MPOvKhsnMWnmZ-uLuJXSdLXhvO1JxEH4gL1AyvkQcmMlaZADSwEZBa8t7dtOWZhPN7722lkMyczuh1uwzTvUgFkDLINTdXTlHHjTYA=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "towneplace-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdPOP3bxqoQZ8mg_c30E6O_7c5EccoTC3dLK33WpZ-Xr3sxVCsU-dP1KuTQXigbci3HWY7JzASADNfDEgQnzVDZr9BEifCg0JXAocmTZPGblY9H1lCn4kuw2PIKJwohjaqCOS6jyqyY7CvS=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfYQ8fE8OXCgo1l8XhK-nY2mVe66wdJ8AN7ekc82S__aAB30ugmiWPM9oMurRAPuu-ESn5f9xA4O0FCmEf9pvc4mDTOgPg1ElY4NiMR7NnT9j9W2tpuLcdw24zFhZ7jQt5-FS56KUbdBEo2=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "trappers-campground": {
    "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2Zyij-yTW59FN3ZmOP__o7uarsrcY1DNMzicPKRyR4A_xcvRlXqMPB7Nd7IjM5M43ht03wKWkfXeqiRbOFlZolEyXy3ft2zWlQKLZ8os-N8qN-Rwb8ZS3pPlFstgaIj8V3KRHf-_egaO5Tusq2PHsSNYGLO4dz5LezCbHm1g5_1riVIJKkCvM=w640-h360-n-k-no",
@@ -349,7 +351,7 @@
    "h": 600,
    "page": "https://www.trapperskettle.com/lodging/",
    "from": "preview",
-   "checked": "2026-10-20"
+   "checked": "2026-10-27"
   },
   "wannagan-campground": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe6J3E5-xL4z6I56ruPYqoSR_00znfZCh5VbGBim7zfiE32Tbf3igIznfw8jaeCZLQ_2Ursx4wcw0qda6myekP1PQpkvG0I5rN3RDawuOPIp1CFEdjMs7R0RZXbIh8xJwQ5OWTX=w640-h360-n-k-no",
@@ -375,39 +377,37 @@
   }
  },
  "misses": {
-  "americinn-dickinson": "2026-10-20",
-  "americinn-medora": "2026-10-20",
-  "astoria-hotel": "2026-10-20",
-  "baymont-dickinson": "2026-10-20",
-  "boots-campground": "2026-10-20",
-  "buffalo-gap-campground": "2026-10-20",
-  "buffalo-gap-guest-ranch": "2026-10-20",
-  "candlewood-dickinson": "2026-10-20",
+  "americinn-dickinson": "2026-10-27",
+  "americinn-medora": "2026-10-27",
+  "astoria-hotel": "2026-10-27",
+  "boots-campground": "2026-10-27",
+  "buffalo-gap-campground": "2026-10-27",
+  "candlewood-dickinson": "2026-10-27",
   "coal-creek-campground": "2026-10-21",
-  "comfort-inn-dickinson": "2026-10-20",
-  "cottonwood-campground": "2026-10-20",
-  "crossings-cabins": "2026-10-20",
-  "crossings-campground": "2026-10-20",
-  "custers-cottage": "2026-10-20",
-  "dakota-place-lodge": "2026-10-20",
+  "comfort-inn-dickinson": "2026-10-27",
+  "cottonwood-campground": "2026-10-27",
+  "crossings-cabins": "2026-10-27",
+  "crossings-campground": "2026-10-27",
+  "custers-cottage": "2026-10-27",
+  "dakota-place-lodge": "2026-10-27",
   "dry-creek-hideaway": "2026-10-21",
-  "hampton-dickinson": "2026-10-20",
-  "hawthorn-dickinson": "2026-10-20",
-  "hie-dickinson": "2026-10-20",
-  "hotel-1883": "2026-10-20",
-  "la-quinta-dickinson": "2026-10-20",
-  "microtel-dickinson": "2026-10-20",
+  "hampton-dickinson": "2026-10-27",
+  "hawthorn-dickinson": "2026-10-27",
+  "hie-dickinson": "2026-10-27",
+  "hotel-1883": "2026-10-27",
+  "la-quinta-dickinson": "2026-10-27",
+  "microtel-dickinson": "2026-10-27",
   "north-park-campground": "2026-10-21",
   "patterson-lake": "2026-10-21",
-  "red-roof-dickinson": "2026-10-20",
-  "roosevelt-grand-dakota": "2026-10-20",
+  "red-roof-dickinson": "2026-10-27",
+  "roosevelt-grand-dakota": "2026-10-27",
   "rough-rider-state-park": "2026-10-21",
   "roundup-horse-camp": "2026-10-21",
-  "spirit-of-the-badlands": "2026-10-20",
-  "towneplace-dickinson": "2026-10-20",
+  "spirit-of-the-badlands": "2026-10-27",
+  "towneplace-dickinson": "2026-10-27",
   "wannagan-campground": "2026-10-21",
-  "wannagan-creek-cabins": "2026-10-20",
-  "whispering-pines": "2026-10-20"
+  "wannagan-creek-cabins": "2026-10-27",
+  "whispering-pines": "2026-10-27"
  },
  "listings": {
   "airbnb:1178892400240665803": {
