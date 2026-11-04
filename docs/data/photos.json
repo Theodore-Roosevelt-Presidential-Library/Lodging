@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-03T11:47:40Z",
+ "generated_at": "2026-11-04T11:47:27Z",
  "note": "Images published by each property's own website or listing (or, failing that, the one Google shows for it), displayed from their servers. Not stored here.",
  "photos": {
   "amble-inn": {
@@ -7,7 +7,7 @@
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "americinn-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLci3e5xoDvoiA6JtWWPtuX2aqop6FriI1EUyokssNPyqanPA41I-JLdv3bzKh0i7WOKzqd4xUU3oErzXDPSBDIfZKjBdkxstFDO5NAkl0VCHZtNOdJV_rf9NK9K_yJ2ieaJUq_ESJNwTBtb=w640-h360-n-k-no",
@@ -39,19 +39,19 @@
    "checked": "2026-11-03"
   },
   "bar-x-guest-ranch": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcDutbvglrHHQIQ3TbeP9iKVnAW3xD4set7cM53noEmOfEXL9uu_SigqfLxhEPaTnCi19ehZ968yz15NzemERGQH4Ixxu_MUJddmnKhLrXZ7PZU56JtdBc_lnDDGsoL7hUaMXZP=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdhWhZNJ70e93C1u24uJssR21z8O0vUf9lQrH0VDsmRxxk2C0tiyeT-OtVcQpPHlf51238kFaKvMwvlIWN8VTsKtcQ_QDU7C2qk7RtrGPWROt0TZfsqxEzJjBv7d-KEUoO6fqdq=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "baymont-dickinson": {
-   "src": "https://www.wyndhamhotels.com/content/dam/assets/clientlibs/baymont/graphics/BU_generic_propertyimg.jpg",
-   "w": 1230,
-   "h": 820,
+   "src": "https://www.wyndhamhotels.com/content/dam/creative-images/en-us/um/text/3x2/whr_3x2_text_travel_packages_family_airport_oct24.jpg",
+   "w": 1800,
+   "h": 1200,
    "page": "https://www.wyndhamhotels.com/baymont/dickinson-north-dakota/baymont-dickinson/overview",
-   "from": "preview",
-   "checked": "2026-10-27"
+   "from": "page",
+   "checked": "2026-11-04"
   },
   "boots-cabins": {
    "src": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
@@ -59,18 +59,18 @@
    "checked": "2026-10-06"
   },
   "boots-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW18r6UI8lO2KI912XBOyFLo9ET4__1HPby62HXd5N0ubi2sB9zVkEgsmfw2MHqIZXrBab0_eBtSDaXHDb3RlzMEj6_zwv2-0uwORybsgGx8LjA9qqe6fBuXwidKPyXt4Dix79IwTTu4zKIC2VY97IUA2JVnjcZGnWLSfvRSJWLq3kGcezHpeD_r=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW0yGFYDqc7jR8hl5xPxRS2uGAKb7PM7llISkTHm9ySwvGODU6qc3GcFE8FrHYIxY0OuHpr94Rwz94XZcCkULxmCl2-NghvFPEQmW3LqyBGD9_rVl2hjQPdQzvV2_MrAjBC6oC8XHDawf27tNPkQ6PqIsMev01bdfrw_orLpLsFCKCoo0ezk7Grn=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "buffalo-gap-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1qnalCrqiGXU8FLdSZJcx-jiWn7ugIQr9AZKXbC-Y1FaRUU18E0ilhzUvtqRDD6RUpXDluo8YHOCZ7H3bEBNVLC4geHt23_QIKGdb-9z2911s3A3WTgl7BtBCz46_xQeHOwbV1wevH3_5rd6BAd4jnum4fms3zD43LpDECyrBoJ04IKkbfvYbHgQ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3PTRPsMDxaFfqer84wc1gJt6H5WHTo3KfEhj3Zyi4QBTokxKc0RnKeAnNY7prmujFElvCONtD64yuGB4314niUHCtbL2tt-UE-5YNFZrl67NA63uUrgI0ce6IMhMClZkX9_zGL7LisA9xzWYVi1RLhjXKV6NzM7SZir6YVV0wkfCl7aafftutZLg=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "buffalo-gap-guest-ranch": {
    "src": "https://buffalogapguestranch.com//wp-content/uploads/2015/09/BGGR-Rooms-2.jpg",
@@ -86,7 +86,7 @@
    "h": 360,
    "from": "maps",
    "place": "Camp On the Heart",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "candlewood-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdx0MtqhnLK-L3iXlZZqBiMcOlysIMhyAryb-a32MenGCwAQOMTyaOSehLXsjXg_FDpEhWLysuk2Q2WsLrZkZj_FJQzx3MadSNQBbm49DpCEnAo5a-83djoLS-OQq7qAuii8xHx=w640-h360-n-k-no",
@@ -101,7 +101,7 @@
    "h": 360,
    "from": "maps",
    "place": "Coal Creek Campground",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "comfort-inn-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLd-ZWCL1bd9Q1NU2JgKQLPzg7mimS--eMBnTinwXmxhPI3Q1WdQInZWnwR7ZNZ6ZJGs8yO1WBDHwRMfjodS0i3Br1YC0nqrLHsAnjNzj4FN5OOELO59XYooBX__QddoE5qz9zGFGw=w640-h360-n-k-no",
@@ -111,37 +111,37 @@
    "checked": "2026-11-03"
   },
   "cottonwood-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfG850R8YFDpHgqScSuEoktHfgZPwibBm7uVu1X_FLKbnY7RyvbNeG3yNb_G0qpTmx7cCmhKnl6xx4p7uKkR4-_7ZIV_4hbfZ3cyaEmFrbIg2e4_JdtNMeBqTmhnr7YRTUlQZnQ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcEvK81NjIESuwB5BzCtpksTJwwCisP3Bi0m_QPjEpGcTdyKSKmp4guE4C3pU31abUfzhNC8FvSBbahGS2rJXf9qM8Lc3HPFowTEAOVyj3VPj-EJX-xcWs8OXEaMKv-HINlsCVI=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "cowboy-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLemtzcJTJJJLLu9r4WuMMtZBJMVR5UYad7VTT9CMwtmhFkUtf8qw28EIqGPGk3aCtW81wsVu4aORdi3_zxoM2SNIRdr3uFd8KH3LdIkA-UZ3TCBsBXETRnVE6Ktr795Y3_POw=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3ZktNbsaAfOXE_JyoV7VAEGuCWOvMolrLPc136XG4fBJTEdIMW1Av-MufAdSNf7tIUBIu9qCemvy26k_oiNu3kUo5pQRid23itVNfTXis9muRT1hSNz1_ve_sWFN5W6lq-1L4URtF5DlJgIgfGtgAPUbLmlGYVGY08XPd7eNHNkAQuXpddzIPI=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "crossings-cabins": {
    "src": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-1154377704705002857/original/d59a077a-454f-4e8a-95b2-66ecdd2c434c.jpeg?im_w=720&width=720&quality=70&auto=webp",
    "from": "listing",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "crossings-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLenEjntHJrNpEPztyoMHjCqhGJPy1AMc1Pys56jQN8z934BXO2yfYDvdBj-iboFvD8u1L9c5Q_gcLBHKZMtUfT9aj51phFhYN3YB8-QRF14ac84kQqbQtCPj0betQk4YSgEv2eC=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLey279Y2CEvdlBJ4Z2YKz0qgfqsEEVQgR7KF6kUdbCkeYgPsoWxPuUu--5u6RMNZonQ_pr7LrKGNeGvzDIJfG_zWBYur5ELVrma7GfVEtsUQNN47K61SPdJ-43rD_TaeT9mgB8M=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "custers-cottage": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2Z4rX9wGT25h_u3bxu0X4Ae1j1YMzmLD8oWukHHMEjuSRur2Oz0AzihFnYYJp6rNDBXvs4ZzRUbAnkKbHvzsinL_pENioBzG9By_sUi0m3jBF_kQ3MeqwCeyCs_WW7DH4WKErbbaI4rx1cwi_aV8zlAXBsMzU4CQ69E5iz8Sbf0pelJ6rtMMoC=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW0BQH3IMkqAgdX27YQ0VnP8nQsNzKH9TW6BqwFrRxMqaVUzWvkHc6DN0VMvjNuwWwMPT_-cEXNOW-RkPHiAqe7PzPuLpEc9nWB8D_xkXPqs1WllE8xskfASYRvqzf4N_LIlkHckbIsfLGba0BQq0QvzFseoy5uuMhBaAYZSxhC-bJ7z1AdIIyzJ=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "dakota-place-lodge": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLePk3LtPUCTxO6HKU2yuMCtVmlTYUPRn1sx_KUWXknw4dTmVhouqSwqj-EnDR6TIhVP3xuZQZDT49-imilJQWu2Orb-7aUW2eYRez3yyplC-U0p24riibWZzeTLBxJiThXnB60j=w640-h360-n-k-no",
@@ -164,7 +164,7 @@
    "h": 360,
    "from": "maps",
    "place": "Dry Creek Hideaway",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "elkhorn-quarters": {
    "src": "https://medora.com/wp-content/uploads/2022/03/Elkhorn-Feature-Image.jpg",
@@ -211,11 +211,11 @@
    "checked": "2026-11-03"
   },
   "kings-guest-ranch": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3BqegIgj2k0-4ev7MbM3CZ13uLpzM2-e4-Z0PQAF9xtLhVZNlD_vMTg91FwWAoE00Uxm7Bha0KRGnJw1tSg_5zYBz6F6IWdui30mUWPuhgQm-gmkkTb-8WVm23K1iyHaQl8NJM5RvTST0ltaSIN6LuSbeobHB6wMPrQ8aYdWo5CIjfNknLQVzRow=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3SVKYZm9WSeGwgFqbLirrohiBVreeRZMr7QUwe8bZw4TsxBVol-I009KAXiLp6BteO3T43Kpt7a-wPFRnLew7jBh4E9n5-tl_hOIKvam3V9avbD9m5z9IeAPoDEmVNR72DAiiXpgFdqsWMiOVq7yX80ju5qALBaa2p6T6GNWAeS8AC6SJjktlXKg=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "la-quinta-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLejLOLEZCHMRdDnhn3n4NmfospmrrGGgZP1FcjG3Yq1pPWb9w7zSki__JffzjsKJmrRpeSsfYAoMV3Pyr1W6zSH7UDBPKZlaDNqXiukokHfSWI14s3fFAhLB-Kcx3RYVSgrwC3j2KaLz5A=w640-h360-n-k-no",
@@ -263,7 +263,7 @@
    "h": 360,
    "from": "maps",
    "place": "North Park Campground",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "patterson-lake": {
    "src": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWmbwhKQN9OVizFMbvukSI5qXjaiYBWXZXjzRZkOU6E0Fn_TU1jb2mkG9oFBLILdpGDrLulvmNM1gDjS7MaBsTZ2MtP8piR5fdRCsW9ePDJhArCSurYNNJDhbtXQpkS1qd1jQaF7Q-E-E8I=w640-h360-n-k-no",
@@ -271,7 +271,7 @@
    "h": 360,
    "from": "maps",
    "place": "Patterson Lake Recreation Area",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "pheasant-grove": {
    "src": "https://cdn.prod.website-files.com/6849a7f4a0d2c2a6fa37abf6/685d664b4914523e4f6eb3c9_Pheasant%20Grove%20Campground%20-%20North%20Dakota.png",
@@ -294,7 +294,7 @@
    "h": 1000,
    "page": "https://redtrailcampground.com/",
    "from": "page",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "roosevelt-grand-dakota": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeeRKCgTRdXYbyNZiZeektw_EUeCnSAkQVCzOB-T7JXvUOGiXLbc_xiFM9-ZQ3Ups7Oww74ktQ5J-USIV9uKtY6tTRiN-5Jb2xtoRi5dwGpJAe5ZL0CSKBR8-9T8QBMRaIag4fi9hwTjDc2=w640-h360-n-k-no",
@@ -309,7 +309,7 @@
    "h": 360,
    "from": "maps",
    "place": "Rough Rider State Park",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "rough-riders-hotel": {
    "src": "https://medora.com/wp-content/uploads/2022/11/Rough-Riders-Hotel-1.jpg",
@@ -322,7 +322,7 @@
    "h": 360,
    "from": "maps",
    "place": "Roundup Group Horse Campground",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "spirit-of-the-badlands": {
    "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW30X0x97YD2fFi3KycoUQxssf-inmOOl2qjDhuwXWJ-pQRNrge5NsvYFrrl36KGYt1FuAsvT3GuErc0oxLs5Xc1PBAEXw8PgM-9OC3rtFym_2gfOJrcUV_VkY4K2oNuA_efEAjYyqUHCijAWKcDtLinYJ-aP_5BIk3z-yX47mpIAX15xW9o4MYG_Q=w640-h360-n-k-no",
@@ -339,11 +339,11 @@
    "checked": "2026-11-03"
   },
   "trappers-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeXtFHMyGhXpFx0aXtbkJjlgvOf2DMA70akgBXrq5TVlIuv1B0v4gAknuLEfa8OX64s1387nWeplNd61Dbn7O-hHrD0a1I7jt_BztHAHBavUV0TG3YWPAZ1wMwz6kVW4ygBP52k=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3jALTdXuz1gYX9dQvXXkFJB0VQo9ZXlos-VP3MgRzq2KGQWTqkQHEskEvcbx64lBvn322eN9Ba1tZaSDzvEeYwnpk9omM3nR6fi7C25TsaUFDGAjHquQ2u3PqrUPJwUXfjDZdmrZQ6oYMXRPon6Bp-HMcYt2Z7QL6EYpC2Lqp4_lifdtXjkVg=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "trappers-inn": {
    "src": "https://images.getbento.com/accounts/3e4701ac16e86b8f1ce090ed04c87aef/media/PJJMsaSdWZKuqWx7AnWg_IMG_0276.JPG?w=1200&fit=crop&auto=compress,format&cs=origin&h=600",
@@ -359,21 +359,21 @@
    "h": 360,
    "from": "maps",
    "place": "Wannagan Campground",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "wannagan-creek-cabins": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW19qrU7klLJzjRSF9bCO89xeyACbR0_Cf2E2_R2BGEXrNUasABnecMuq5XN2-07M2yn5cf32Qakdi-L7GUXSs5EJJRA4ytXcjixFGn_LRjkUyCMXzl7-odkEb9VwER7Insn836Q01lhmMaJOZCzcLhmaW7w6FscVuCnwxOBzfFfiC95BuOMNhgp=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2aJN74deactJoB3nnHHNvAAsVKFeoMGwGxaCytJSFagrP_qNsE3C2QT6P4fsDMhlPW2ii7rGMOD7J7Uy54DtqtK6PgVSJBc9_hdbuf_Z23huyfwvYxruZV--bP-hOm5RXEMOtlLJLjqYMBNaHUPADdRSJXkQsGpmbqjlS11jQt65cLroB_GuCM=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "whispering-pines": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfNHjB4Sw2V_Ooz2MkiIHU09OAwCYL14QAfUO2-QTWdorusdBSfIqltguRUJPVY4fBior1ilq_bJ-ZIXwSfpaY27eavuQXN0Wb5fHCeDOK0OBwvXfWebzgk4cEbmNEDl-uFpmG2x9vIccCu=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe71zSqFYryXCTO7-ZiAxOfuUl8tqrV-JJ45h4ntfBtrOjlcm7PekfP7PKFL0L2CMoHXN324WFefyxMJQG22S-57dGVipZSkj_UoN2ZHtowmWiZXem2WmwpvhwCL-KMpLRqm7-0rRNZOjzx=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
    "from": "google",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   }
  },
  "misses": {
@@ -383,29 +383,29 @@
   "boots-campground": "2026-11-03",
   "buffalo-gap-campground": "2026-11-03",
   "candlewood-dickinson": "2026-11-03",
-  "coal-creek-campground": "2026-10-28",
+  "coal-creek-campground": "2026-11-04",
   "comfort-inn-dickinson": "2026-11-03",
   "cottonwood-campground": "2026-11-03",
   "crossings-cabins": "2026-11-03",
   "crossings-campground": "2026-11-03",
   "custers-cottage": "2026-11-03",
   "dakota-place-lodge": "2026-11-03",
-  "dry-creek-hideaway": "2026-10-28",
+  "dry-creek-hideaway": "2026-11-04",
   "hampton-dickinson": "2026-11-03",
   "hawthorn-dickinson": "2026-11-03",
   "hie-dickinson": "2026-11-03",
   "hotel-1883": "2026-11-03",
   "la-quinta-dickinson": "2026-11-03",
   "microtel-dickinson": "2026-11-03",
-  "north-park-campground": "2026-10-28",
-  "patterson-lake": "2026-10-28",
+  "north-park-campground": "2026-11-04",
+  "patterson-lake": "2026-11-04",
   "red-roof-dickinson": "2026-11-03",
   "roosevelt-grand-dakota": "2026-11-03",
-  "rough-rider-state-park": "2026-10-28",
-  "roundup-horse-camp": "2026-10-28",
+  "rough-rider-state-park": "2026-11-04",
+  "roundup-horse-camp": "2026-11-04",
   "spirit-of-the-badlands": "2026-11-03",
   "towneplace-dickinson": "2026-11-03",
-  "wannagan-campground": "2026-10-28",
+  "wannagan-campground": "2026-11-04",
   "wannagan-creek-cabins": "2026-11-03",
   "whispering-pines": "2026-11-03"
  },
@@ -414,85 +414,85 @@
    "name": "Longhorn Lodge",
    "summary": "Cabin in Medora · 2 bedrooms · 2 beds · 1.5 baths",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTE3ODg5MjQwMDI0MDY2NTgwMw%3D%3D/original/8804edd7-fdfb-4b1c-92f7-6d8bb8dc5428.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:1447092693241353049": {
    "name": "Roosevelt Chalet",
    "summary": "Home in Medora · 3 bedrooms · 7 beds · 2 baths",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTQ0NzA5MjY5MzI0MTM1MzA0OQ==/original/ce77e7c6-91e3-4e02-b902-a9b230191907.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:1647955611953629978": {
    "name": "The L'Amour Loft",
    "summary": "Rental unit in Medora · 5 bedrooms · 10 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-1647955611953629978/original/9e15feb5-7d2f-4426-a093-982160419e9e.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:1688532697492715707": {
    "name": "The Old West Hideout",
    "summary": "Cabin in Medora · 2 bedrooms · 4 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-1688532697492715707/original/7bfc3d92-d007-4aba-8ee7-4799fa6a9848.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:1706929444431274600": {
    "name": "Prairie Rose Retreat",
    "summary": "Home in Medora · 2 bedrooms · 2 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-1706929444431274600/original/eafc8a26-d2b1-42e2-a8fd-06d1b22a67a4.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:17766498": {
    "name": "King's Guest Ranch Vacation Heaven",
    "summary": "Camper/RV in Medora · 1 bedroom · 2 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTc3NjY0OTg%3D/original/39853614-6074-4178-adc5-b5458be9db55.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:19661290": {
    "name": "Scenic Buckhorn Ranch Cabin",
    "summary": "Home in Medora · 3 bedrooms · 3 beds · 2.5 baths",
    "src": "https://a0.muscache.com/im/pictures/49584411-5e2d-476e-a123-c0254118bf71.jpg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:32477653": {
    "name": "Roosevelt Suite of Dakota Place Lodge in Medora!",
    "summary": "Condo in Medora · 3 bedrooms · 6 beds · 2 baths",
    "src": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-32477653/original/d6b90e89-3b5a-486e-b534-49d73d69d106.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:35419952": {
    "name": "Badlands Suite of Dakota Place Lodge in Medora!",
    "summary": "Condo in Medora · 2 bedrooms · 4 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/prohost-api/Hosting-35419952/original/d69af6f3-94fe-4955-a67b-abbcdc43f49d.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:48740439": {
    "name": "DAVIS CREEK CABIN --Medora, ND",
    "summary": "Cabin in Medora · 3 bedrooms · 5 beds · 1 bath",
    "src": "https://a0.muscache.com/im/pictures/d71ee5ee-5902-42ea-80e2-ebaf64b84dc9.jpg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:53457764": {
    "name": "Breath taking views!",
    "summary": "Cabin in Medora · 2 bedrooms · 4 beds · 2 baths",
    "src": "https://a0.muscache.com/im/pictures/miso/Hosting-53457764/original/963acf20-4023-4d3c-962b-7031de459f0e.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:573921940920496377": {
    "name": "Cozy Medora home for family gatherings and fun!!",
    "summary": "Home in Medora · 4 bedrooms · 11 beds · 3 baths",
    "src": "https://a0.muscache.com/im/pictures/miso/Hosting-573921940920496377/original/0b4b611b-a8f0-4879-8443-934593dc2e6d.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:686990376785014055": {
    "name": "Historic 3-bedroom home in the heart of Medora.",
    "summary": "Home in Medora · 3 bedrooms · 4 beds · 2 baths",
    "src": "https://a0.muscache.com/im/pictures/miso/Hosting-686990376785014055/original/237837bb-67d5-4659-8757-35ae71006965.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   },
   "airbnb:896877649297990845": {
    "name": "Medora Cabin - Trailhead of Maah Daah Hey",
    "summary": "Cabin in Medora · 3 bedrooms · 10 beds · 3 baths",
    "src": "https://a0.muscache.com/im/pictures/miso/Hosting-896877649297990845/original/a8d4532b-39b8-4021-aef3-20c4abd7d700.jpeg?im_w=720&width=720&quality=70&auto=webp",
-   "checked": "2026-10-28"
+   "checked": "2026-11-04"
   }
  },
  "searched": {}
