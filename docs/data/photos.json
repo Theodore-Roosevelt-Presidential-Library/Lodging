@@ -1,14 +1,13 @@
 {
- "generated_at": "2026-11-18T11:45:21Z",
+ "generated_at": "2026-11-19T11:45:44Z",
  "note": "Images published by each property's own website or listing (or, failing that, the one Google shows for it), displayed from their servers. Not stored here.",
  "photos": {
   "amble-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLff54kTi0UoJhslo49F0ttAYWZUCjvW11jmn4pq_tup91jpJSQ4bmpTLC3a3JLv9g3gPwTNNxAheBd5aT74K-p4jT-1ZeWC-jQsB8QdFBFBqykTIqlC6PBqPwLHKuu5i5Sj76MI=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLc6j-38s8CggskbRUAwAHbPryPOtaGH6ZdRFMLTjkBHFHfBZqLNmHPmKJh9i0DOBmKTu67S-Xw_7h0v6SfeXnpL6kD3x3H97XfUYfSF80G_o_Dw_iSdMeiP96xcHNE_wCw5OlS3=w640-h360-n-k-no",
    "w": 640,
    "h": 360,
-   "from": "maps",
-   "place": "Amble Inn",
-   "checked": "2026-11-18"
+   "from": "google",
+   "checked": "2026-11-19"
   },
   "americinn-dickinson": {
    "src": "https://www.wyndhamhotels.com/is/image/WyndhamProd/52013_exterior_view_1?wid=1280&op_usm=3%2C0.3&fit=constrain&resMode=sharp2&bfc=on&network=on",
