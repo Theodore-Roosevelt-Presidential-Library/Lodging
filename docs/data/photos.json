@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-19T11:45:44Z",
+ "generated_at": "2026-11-20T11:44:18Z",
  "note": "Images published by each property's own website or listing (or, failing that, the one Google shows for it), displayed from their servers. Not stored here.",
  "photos": {
   "amble-inn": {
@@ -52,7 +52,7 @@
    "h": 820,
    "page": "https://www.wyndhamhotels.com/baymont/dickinson-north-dakota/baymont-dickinson/overview",
    "from": "preview",
-   "checked": "2026-11-11"
+   "checked": "2026-11-20"
   },
   "boots-cabins": {
    "src": "https://static1.squarespace.com/static/5fbbe6327f712a4299581716/t/61574162e025470b310823cc/1633108322950/Boots+Campground+Pics_Final-0705+%286%29.jpg?format=1500w",
@@ -74,12 +74,11 @@
    "checked": "2026-11-18"
   },
   "buffalo-gap-guest-ranch": {
-   "src": "https://buffalogapguestranch.com//wp-content/uploads/2015/09/BGGR-Rooms-2.jpg",
-   "w": 1000,
-   "h": 714,
-   "page": "https://buffalogapguestranch.com/the-lodge/",
-   "from": "page",
-   "checked": "2026-10-27"
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3hsLZNPVIvzzHxN1z6-pP_0m0fubXu4zCwdveeehecjsUa1joCyKiuOai6hARd_58OrlyehK0Vw7y7oAqGJdC0NMFHFEBV6WMF373rBXD8Ueb_tFzphynFzSCV2et-t8SqDd5GmGJIJHqSz6rMDaPf-GkY13AwpuBqd0YRir1IdT4l9k3cUvscdQ=w640-h360-n-k-no",
+   "w": 640,
+   "h": 360,
+   "from": "google",
+   "checked": "2026-11-20"
   },
   "camp-on-the-heart": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeNKGVIvyByccagwbQbg8cAs5OkZxRTNAiA8v7RyrUQa-XolX8bZwATQfadbI6nxi0jePWgCRTQy5Xwa0pi8u_3xWfTE2iO8RjL1tSjeRVxC3uW7bx7nIVrDMmF2lKYhuWqZI4O=w640-h360-n-k-no",
@@ -383,6 +382,7 @@
   "astoria-hotel": "2026-11-17",
   "boots-campground": "2026-11-17",
   "buffalo-gap-campground": "2026-11-17",
+  "buffalo-gap-guest-ranch": "2026-11-20",
   "candlewood-dickinson": "2026-11-17",
   "coal-creek-campground": "2026-11-18",
   "comfort-inn-dickinson": "2026-11-17",
