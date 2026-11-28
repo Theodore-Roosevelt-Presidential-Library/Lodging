@@ -2,174 +2,174 @@
  "note": "First Google Hotels image for each tracked hotel. Used by collector/photos.py as a fallback.",
  "hints": {
   "amble-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLetXNIWjBnpmfSnDU7D9-TAz84RDiXLHBI85GD2AYZLwlsZ-k4njPA-ne0NPu_1VE5nVDJLefGH_NWxEjzKzvfMR17ylGsS06qmBBrbG4ZqDedc5G5_BJsyWMEHhBpyaeM85rdk=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdiRRlCd18Q8i8jfARvVP4h09eCBZdd3JpaJuwWBZI4rHIcPvHajUE_nNmP-664QkpLeRnjI2-9dasI6Z_kesbOrnpl90B4j_6AA2PS3BF2VJTxVuoVhpSiF7r3VXMMG8yGWMqs=w640-h360-n-k-no",
    "name": "Amble Inn",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "americinn-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeQ6qPTfBMSM6gcloukatSF1t9Zf8EnIbcVsODxIJvYzkEAHVl-9bCWvNA_PEI1brJUr2JE-wMgY6AIr6K-A68KK83bOlZFwnsKfp7nCLqBQXh5l4gFMzyFKPcRirJI6bhzhryMMT1R5nSb=w640-h360-n-k-no",
    "name": "AmericInn by Wyndham Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "americinn-medora": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe6muXJi1nFtZEWqOvhj8HbRx7RyzUMWOxeWtqcuWWyWWVa48eQGHBkiHrrIwP7BWV7sTpDGpOApc6FHWyuwENLB2IMyQugvqWGOQJN5xNffZQVBAYpJO0zVq0K_bZ-LCO5-3jZkdIDicz3=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLebs_zcBiQXOamJWfYRHmXGC0ZyJYTHm9UiX4cwQMcyUJf7v4XcKFl4_B3TzGbFwaVglZbjMLKkf1IzRktVzfG1_faCgQwyou6w3U_jHRhkEBWDU1w7NN0E4KrEw_IoJKLNOq-Rrh_OFBg1=w640-h360-n-k-no",
    "name": "AmericInn by Wyndham Medora",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "astoria-hotel": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeeNnwMAUgn41_QRnAK4MDgWLE-siltGpoITe77bG3nGKCgn54KmG5Bjpn7_KX-M7qkWNX3Ak6CRhBjc-MpMavSUXow9MuwiYgpZKK5nCM3a6rwoNZDaLG_M4uLoHpxwjgW7R0Z=w640-h360-n-k-no",
    "name": "Astoria Hotel & Event Center",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "bar-x-guest-ranch": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcw7pzUZyZyAzD7kPjLdJYoRd8lcNvIV5FFUslRPw-7UyOKKpEx_9XqLph6Z4MDUrJIKJefSmVFYltFr1zqZ-927XrNTR6SMBl0bqHTVMSjbBVn5MRwpnQKfZaom8QS9XCuN1tD=w640-h360-n-k-no",
    "name": "Bar X Ranch",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "baymont-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLf46hnk7CFLZ75Ji5-yiUE_6mccsqwYEM0HuYqvOIfZWhPVdWPBYpGt1QeskTiji8ar6MBX6QN8LzPg6QZdlOlZ1sbwGc6u8JxPNrJ-fBZkzpw3_34e4Kfr8TlufU83Y8lbOXNBmC5gw8_H=w640-h360-n-k-no",
    "name": "Baymont by Wyndham Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "boots-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1u7YEKEGEYtI906CAqmJrW0bDaZmL3CN6WZ0DLZrmGCGQCgz3ev-KfqYdpbLopj3sm8cG7S3lbsez7RFTH6A_3eQxz-L0KAXL4NlxmqcMjdKcWo6OuA3zrXHtFEWgoPu3n4B2IWVK_ywro0bs908mBHa7Q0eLuVFDj5NI00Pg56n3khZ5f8gc-=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3u6suJvL_WLVbdBjJoIZXoZDcZz64WrM4Jwc-zfl9r9fKFthHO54Yw5ZSnhmuftXTBQKx-N_5VBYcKbTBUEwuHPcxZC_Mp5QN2XwObDLK6jlmeYvfibzbqdFH_RZHRHoYbm37c5rKr4q1vV8ShJqyRjfexd_nKfdSunElC2mookxf_uCQN54uL=w640-h360-n-k-no",
    "name": "Boots Campground",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "buffalo-gap-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW09fvb7vixU_rjd1c_bY8dzN_JgwT2wcs6Fx7ACTO_4sI1HTbv_t4MIwLS9doXffPq86Ha--CEw9p0T1WOmBp78Gs9z-tVBGjw_dBfp2tEjYqQweyRq5dlEF_LYW77nynZRFLjs1MXegODFoPmzNnpJzwopckttjc84AV4wrhnS0kWyjfE9ClJ9uQ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1-IUSqe0j8hr0n45D0y27FyapPwMkMMBkazva-CIQljArwbzg65gCKBKBRdP9_Po5BtRsc5C5WoqAmquuwQpkZCjrOuimuUQdwqKHrZjrLh0OBXxtRF6GDqaqDrotRnDplrPTx38SAJS2ItPdLDSKrSitbW71Bugw92vIq2I3utSNBl36LufjzFg=w640-h360-n-k-no",
    "name": "Buffalo Gap Campground - US Forest Service",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "buffalo-gap-guest-ranch": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3ftpkJ8tSxvKd824ratY-C1Bwz5392cuCZXl7m-xs_gAg2EjMjjqpra7DUqJ2TJ06pK9dGNMOMLSCOWYj4UbCKQowTFOvtkH7Qwkhi4J93Dnx9Cjdnzgx69CBwSC05QFdjV8TCbvnVzKi9wHKyPKP5js4-ykR2qoewMhheN9U9sLPNlYrF1BmFOQ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW04GvjxBTkXshkYYLSBTOepxGgylH-_0yf23KfhzU5iobnLwAR34xkeaiMhwNNapKJBwy1-rWdbcXAxyYf5Vnr0XrIX4mF0EekXD6yLUhNbYSb9ohSXSj30xcFNbv2xIcdOZ8F0XpHRPJb8gpNuxzyXSA_uWXejlVjVhJosPdS9IF-L0Eho3d-DiA=w640-h360-n-k-no",
    "name": "Buffalo Gap Guest Ranch",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "candlewood-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe4tMtL4-0h9YhOrz5D24YciIZSPJXdjjo79Bg84JQFjo5dccjnd0BrApN0mJKZb79FQl8dmKiG0NHYgxahyRItP_EpzPE2BL5UzEMahDDPaSw6S6PzQMFeT7X1eIanKDUsyL3y=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe6ObKwr3OE8WE3v8UfzLAWi7X-zh3_gg9jVVkSYMBKAOzIKaHb63EwmseWG2pQxjC3YWW8uPD1RtotqmbAONn5WnEJtPWzrh_uhc2L-IR5bqbsMleyWZgcfXQN64stBWk_yUAG=w640-h360-n-k-no",
    "name": "Candlewood Suites Dickinson by IHG",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "comfort-inn-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcCmm6SyaIydlj6IJ0cc5fovSEw2aFemOHGYSxaqKHV7uxsMDwyuqgNF8gyJ0GFRvppbWmW2FSZGVumvRIcEYaUodQBelYq4WhG7m1cC5oz8EihxMYLs_UkQx8wlTuAQ6B74H03Ew=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdg268GKUlVXDtp40FzDxEy8OnUmFKy8Nak3S5AJpMZQMhFypVQBlw_H75ykWmGdj_JEearPJ0Llp8saXP-1zBX2iSERCG1WQlVgWKTwAdT1SkYuZ25jUFyS8OzrAHuufy_nUP4yQ=w640-h360-n-k-no",
    "name": "Comfort Inn Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "cottonwood-campground": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLc7MHjuoiC3JkJUiCoWRGuZW7ANoz0WiqI3lBX1OK8QfZhMcBKTG7b0bQBC087WewwX3lBHPaQ_km-L1RkTadFLm2jNKx8HwHWdlT0vwTAj_xVMRqdyPmyhYItH12GnQrPB9y-K=w640-h360-n-k-no",
    "name": "Cottonwood Campground",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "cowboy-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW27E9toHCOi-IAK6qxL0DFCWnTf5F33S0STAHS2VX6gGD7Hw1Yvnp1BYW_OeFyK-ALQq5o7hZTalokjkYAX-cPRimqHOEPxHTZ2ZrxIISuC2AyyCrGsgDTbFOpyJYFtL4YlV-JUggk-KZJlCoFYpbwUH4q2VioAZN199hQNHqaV64r3AjjJBrQC=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW0Q-z6DnVbCme23Hb6g8OGaFZOS2Tb_kTY0KNLDCnLb3VXxvaGwkW_VHabYsWvYo8RgDnNSRHTh5z2vsRNKoGjkwynZ_OMCKiJqn_BAsAYs6lm8imwe4Y-qurggybe1HCcQA9cT2P6tg_Ucbw4tQsqsu-J8N7AIoRq3FdWn8CcFsAyNXQQrAjUE=w640-h360-n-k-no",
    "name": "Cowboy Inn",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "crossings-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdTuNx6jpwwyT39pycrHHM98LCv7FRR_ZGmfEuLHdGy359dFYOt5wumstE6vz54z7n3ZAlVwFl1MLSumbnye9bbsgzA2dyZQtDEmBVP6BPeWzB6HyfuXH7xF9r_2Raw-x45g0fR=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeJXBNoN8v9qsyF5XGeqF7IujwZD_fDdzAhDQXBJXF2gDwor3F9jTe2UcB-bZEve5xOn0iOGURr-uNQ_XAsWuWQsJ5MBfXr_uu_egLQMiWnm4FCQbKVhXMr_Y77NXflq3Rz4HrN=w640-h360-n-k-no",
    "name": "The Crossings Campground",
-   "seen": "2026-11-26"
+   "seen": "2026-11-28"
   },
   "custers-cottage": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1mgm_QMr3LtraN1h7CJsuWG3nD0BohlE6WxQPxnzYh6WaCgH0xCWyuS5E1XElMcGxrzqp_CL64QdxyK_wn0D1DM-45sF1exTbpbd7ObI1jTYaoUe3a9fm6AcXyX2hZITfNlA8xDWd2erzVfFgcT1yAmobAwXmb5EwEBd9ELdW9JG87j0KJ9WfF=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW03MIYOE-1rzrECbiuNoNb3XHuviHqklAE5_yNL5-Dk4QXjb1mA4Ot7Qg3JBi7GVNwtacvNDkvH1HFLNbW-vbke30sLlBPB00l3T1P9YylEuqjLnKgEXm2SiHdDn-jBUASooMt0RzajY9Cg5spcfnPlb1EUTTaWM0zZu2wOfpwsGKDhnRVMiTxd=w640-h360-n-k-no",
    "name": "Custer’s Cottage",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "dakota-place-lodge": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLc65zrkyyAphaGQPUP95hKt7eZ50bV-PZ1M7ctM0grQK3ALhIYH12C0_NHANmCDRj9NOB1cGW5piVs53s25As3lZbmMLeI8oq6rAy0Kwgn_RJ4boLe6yGYcXk-sdV00MstG8ix0=w640-h360-n-k-no",
    "name": "Dakota Place Lodge",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "dickinson-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLchh1GOmSYh6o3g8s3aUKPovulxOF6lymQ39Xzo6wjbTCgb3JdqMaAtbrfV3iSVoFJoRms9RENJEP4t2GFAqlemMIiMYwm7X2R8tszJd57KtxmUdneNkAQX1GsZQNkpOwzXMtAmLBsGnE4=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLduGrhNLFH1v1ctRwCRHLllOTdAtVMz12UGaT7ywZfdKBxFeNqSLX4jn-do9syqIcuU-MfSgiUuroqJZJO_I7200V4LO85m9R0QcrwUI2LQqWM2pUcw2gE-O-tsZ91DhMcdC4ciFO-Xwmo=w640-h360-n-k-no",
    "name": "Dickinson Inn",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "hampton-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe8DhmAZQMM90Ay7a_AHYS7W1jFOHklhg5OYRjp1m2YUw2wSLLfqhljaXhtaTE1DzIziIYXO4kMiBKe6ZXVC0MHOC3Tev0AIDSi0H_-2udlbjJSKIcj_8eJyyLX8Ca9ExgjSY9KyWITvE1x=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdZ-oh4ecV-xVdktK1VzqokFl94EUimfvVhTkGHJCSlcdltwHZgJD6c6L__8Ay7scwW5qGapOgADdxJnvlcZD3lTjJrJJQD1xf0RuwghQFJKfOe5XDokqIMmh3gufb5Wzg9CbpaKvzW18U7=w640-h360-n-k-no",
    "name": "Hampton Inn & Suites Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "hawthorn-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcpaxSiZ3bp6akKZyjP9X3wAYvTlmsFIEnPn11KpqDiJssMD6VR2xPOkt8XK4fI3IC-quPbXhK1AM_jAAB67IgwLXsfd3PEocBWoFiRI6qQCwSKjvzsgwneqWw49EkzrxgPcMqpdW0DhkeU=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcL7cdO1TB6Mns3e7inD4nks3hfqoKX4GYSdm5RevXtwztxNUnFxUCcv6uwlMLINhBHXdJi8sinhc2Uw4YuEjxMhPnY4KtkKAj1Y6F6jMyO7HECcBI6-8GQQYxvFwkAcUnkNozxK-H92Cec=w640-h360-n-k-no",
    "name": "Hawthorn Extended Stay by Wyndham Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "heritage-hotel": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLe0ZcM3W4Yv6ZtjSi2o6TxlPImk1jegadbWpA_-dl44584XBuC_b3qcibpZB_GEl4Vjo56uDBhFXmBM-_jN5rrcUBGdaJV9C1eJg21oFTI2FXVTkeRStxZwRmToD0pEZIRrZclI7d1GkR4-=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLft9tTQNudDzB1CMKoUNxW-PorXSMsP7NpjkX6Yrmz8YkyRQtAUHElaFvYgUr3L_iTatmoQG1hTZElklNcjm82LWXc_RNMBdxBjRzeaatjtJGBph_hxjcLsbRQjkKy7IbXjnzCaqiGQoWv1=w640-h360-n-k-no",
    "name": "Heritage Hotel and Suites",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "hie-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLed32uxkmyqWwMgOkPMQYkEGfAc6xLQnsFd1-EO2EW-xPLqdjZqdit5snLQdgq_u_Bse5SXkIiwuK2X_YFt8tae-OCytyP5LB4E7ALlNalZb9dZsILEzESvZBHw_o85eV3sywIKwg=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdyhb7wynrjoA_qkKELMOkfsdCxi1hzs5SG3maNeqk8y0C7tOrRaSKc3nNPZS_Mk-yjgur3U5hzGS9TU3lqOO6-612J9si4BYEcjyiPyqsZYu_rGfkyiUVU81LBf5X0WI25iJdEcA=w640-h360-n-k-no",
    "name": "Holiday Inn Express & Suites Dickinson by IHG",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "hotel-1883": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLehHz-fFn4TglHr-SuLEk034dDAYwq1XCoPzkBUGgZAE6AaVCMCFjIkheMT3DVlS-15nvniUMSqUXmSfEx4ffJb4zzQQNp4fG9UIn8Q-vvE7JCzMU9mKOsVJtR8Ij4AIvfnqUOPV_i_GH8=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLcD-VCXTDVKDU4qhLUkYQAycoeGDs5BMVvWEXirlc8bCVONM466lQmkQMsTIh1PBocJBub0LmNw0dgWSJrupXV563tWOByXqPhVnp3bcdiT0mwwAnPBNPu2_rDt0OVsoUs85XB1STes58s=w640-h360-n-k-no",
    "name": "Hotel 1883",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "kings-guest-ranch": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW15s0DMw47IqUHNqO-ccZ0Ivw0ztvPT1WIuiSwK-_cTEPpixOr7m5ySS6GXTOpNNJuaH-vkXqKQUmqK29L3RxSZrVylkFMau3CvWf_LhHP-B99Y4suP1KtnDkvLAswxpl6ZcP563RVILXrPrS6XQIJsnmJ6TakCUoAfKve-IGa1uTgssC5JjlNtpQ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3Zro3aRc8HVx8llEaq8LavfN_bGE6IpYklisvJSafeJ0Wr_XhtyvUMnKs3sIjZM9dDHoNDWVjRQ2k_utVDRLyuQrYXFLqOinpMbDWLGZgl2igqWS54OXygvOQqOPIdczPDuZUrG7O-lHpv8JNuvPJaIbj-TUP5puhM-WtiLBNg5EwgcyA4glkyOg=w640-h360-n-k-no",
    "name": "King’s Guest Ranch LLC",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "la-quinta-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLer5ar2JJzJdQfdY24NwWLngEYJ3wWhfq-sE0aVDnM7uaO1JCpCC0tB4WYrpUphyHzEbDVfkUpupXVjVsLw51l4XAivwdr0jraRLAHqUEmBff5PJy7kUrqgq4RET1w20-tGVeFCS-XfbiM=w640-h360-n-k-no",
    "name": "La Quinta Inn & Suites by Wyndham Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "microtel-dickinson": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLf0HoI46M0hfVnznPsEFm9cETvT5pHd6o4OaVh5UgRr54H5Fw7PPvJDqDHmbfvO0shlYGo_LC1qYig4C12Sz-y6OjvMK3QbDUA1HjxfI7b4ZfhXq36DA7ZWBHpqEtBE3kAzD_cyv05dc36U=w640-h360-n-k-no",
    "name": "Microtel Inn & Suites by Wyndham Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "my-place-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeikzrQ-7SpJz7GT_H_UXayc_aj-uUGIV601tf5-gSi_DCdu_1kcRs0xEdDVPksEWXtTveHoWk8MJr3Tv-t8fvrKZ5D8y8sO-FTI6EzQ_zwVIScgL3_SdcDTd8tXCMiWVgN_F2Tu3pK-9Cg=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeZBHG6t7vn0QlUVW6MIKt0UGT_UPENQM4GrMa9t6S6uxsDzF3ypU99_1mWkLiAOl0E-NUgLoKKWHRNrNV745utKfqMc_MCcUDD9dmM6l_7bMccKO3zZgYOrHJ-Juk7-5dcrMW8izdfntI=w640-h360-n-k-no",
    "name": "My Place Hotel-Dickinson, ND",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "red-roof-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLf-yB0T774GK03jnKN3HLdtgLi0lENLkR3_i_d68Arf6Vwcantv5A-StHbL6_zgq1s4N-fHCmBPeqXAlZTEI-Hy133wFwPPSpVF_tJugqMiZAaCw5UZzFwLi3GQX0vsHEVJflreKg=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLd15dkpIsiQbjZ0LsUtZVQTQoBeRdvSfdXP6wqBNkbwhGLZKtAcbqOXx7IK3HNJHVWptZgfWuLmU3ioNQRRGen9uEHIGPcy5zdPjIFN2BEcP6hVVgwOMkUt4R4Z0pSeu7frGa5P9A=w640-h360-n-k-no",
    "name": "Red Roof Inn & Suites Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "roosevelt-grand-dakota": {
    "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLc4BiSzldtcYqu-2zqQvfZJpj1WQyyLb36aij9at8Hhj9pfDlZwdVEFpl5FJBH5g0yMlZMYo33WheiZO0GYzP-wC_MjDW_i0V0fOumclXjS_hWiWho-P9mQW1OBGtFwe359lgWdwvj372TX=w640-h360-n-k-no",
    "name": "Roosevelt Grand Dakota, SureStay Collection by Best Western",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "spirit-of-the-badlands": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3uPBzuU410SoOm8wAJAz02GC8W2U2M6U7K8ADkit0YcJrapBcz6Wkc8uRtk2XMfjnbgT01rrJpt7cTzDPEre4jgCMYNT_hO4ToSf1ctgXNpGqza597KPKPtyQTi5f-ySYDIrmGctr9iZQeAIYwMJWsTB5vlMuvEtGICOAo1n2w-L0a70l7-VhCWw=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1YbKs6xHSAGH4cR1KoZBR0fE5XBObux9-DZn5kWJ2V-hGAsTLlEYDyCTmVDFEc2L2EQWF5wWO4tsKM_9tk_Wn3n_s7PkSf77oaqx6nT8lwKuETH85_dGz8j8-DKltZ3rzqvfF7ZgUgnosuYcpV5jV9vQXjUc96Upru4bJ64tP52dj-A35ozuPicQ=w640-h360-n-k-no",
    "name": "Spirit of the Badlands",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "towneplace-dickinson": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLfOx2RBt9D0wGvw9KJjNJx1baOrGVg3ej_fV6QT4jfrF8_yXKCVh7pXh2_ma_frFNxl3jn8snCu5OAWo_9_xparGMtby78CJucxD2hRbA6qIUyayjyPKwsuMlYlzJj_UUpgh74khNVO946-=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3yvddE42JqS-rValw1AMoxDwmaHuBh8aN5beWLYLCEL9XkpzRxWnqF_4b2031DNJvI0nNOeO5S0wBl99t0slh6QBqb0kx5hWt-y7YoSDIh2Fa-MiuUWeZhNjiFBqBOGkDuY8dJVsGsKPUsgtCC3vIAoLCxx_mPudElOpM4Ywz3vfIVA9NkpnMV=w640-h360-n-k-no",
    "name": "TownePlace Suites by Marriott Dickinson",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "trappers-campground": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1VdI9QHHUc81hQ4Vgu0-amTohWpxXkpcFVOIWcBC1VhljxedGM9hXX7Rxo_ieZJuOxvpA9rOhv7D0jki64Zfc3EbWt_zqPi8XIpbTeNrPCq0dtaR1GI8GdXKonG59aoeH5B9ueufd7trrH9N-uukaHI5-5A1Wnv7lJsRV6HOi-VLXHJDR6CA=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2mHiEMKCE1MpuFnESBlIhgtjl4kl92sIimsOO6e7_iPSnFDi6HRjkzEbtQEBuWNMjMbIOSvEft4r1lEwM2Z_7HNn89wlLraqg68Uw4LvnyMbCQ0O-ZAC1UY6zgwsBG_3pg66LJkrdrCEr_TGBEpieSCA-QEIogaJ0yQyK1zaXzdRMQ9QklbA=w640-h360-n-k-no",
    "name": "Trapper's Inn Motel & Campground",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "trappers-inn": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1VdI9QHHUc81hQ4Vgu0-amTohWpxXkpcFVOIWcBC1VhljxedGM9hXX7Rxo_ieZJuOxvpA9rOhv7D0jki64Zfc3EbWt_zqPi8XIpbTeNrPCq0dtaR1GI8GdXKonG59aoeH5B9ueufd7trrH9N-uukaHI5-5A1Wnv7lJsRV6HOi-VLXHJDR6CA=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW2mHiEMKCE1MpuFnESBlIhgtjl4kl92sIimsOO6e7_iPSnFDi6HRjkzEbtQEBuWNMjMbIOSvEft4r1lEwM2Z_7HNn89wlLraqg68Uw4LvnyMbCQ0O-ZAC1UY6zgwsBG_3pg66LJkrdrCEr_TGBEpieSCA-QEIogaJ0yQyK1zaXzdRMQ9QklbA=w640-h360-n-k-no",
    "name": "Trapper's Inn Motel & Campground",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "wannagan-creek-cabins": {
-   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3rcc4exSEVoigEA-hwtT-zkrsIuxAt6yfn7rzG1Fp_EnUnu8qUkZ905EZ6K9V7x6MUtJCsGjKpANAxWYIfQkQtN9UIRoJbl-ptfUc-x1TA6_PlQ7IV-6bCUkusDv8zads4JgnC3N7PsQTTsBzCsJtaBCBSQJ5eEJCt1gqrbIy0Twv3LMSqayc5=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW04wZ5s0vN6FIgkqqDgp4AsG2-6HE1gMXCqBqrAOq-6C6OzEVZS9-UowhrDQpJuV0i1XiAWfHzOaAkU878-W936_cpr4TnPGCpGDLbA1CW5_pKVq5xgtGuivV-1V-V5A9Ws5fpa53ZdwOBIiIv19jAqbZu5C1XLzWZo14xzR8DQL31Q938dGhUp=w640-h360-n-k-no",
    "name": "Wannagan Creek Cabins",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   },
   "whispering-pines": {
-   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLeDj-Prsl58sreR-vZJ3atJgEwYTwygz0PFo_hQu_Es2MUt8lnbP5y7Kn_d6rqKrVBlB0jMElMdv-pQckBLXKmRMzqHoIJMUVSEGspvlTc1HDbkfimfcsG4ZfcKJaoGbnadjdrop3IftuHZ=w640-h360-n-k-no",
+   "src": "https://lh3.googleusercontent.com/grass-cs/AABkmLdrfdSlmTFSbfzvtWpAZS0JqdxDyhTdnAEoAjg_keMDns8JhqSYCHjJa67DYGepgmeu1ldfNBCAPhDdFJlOLABrQDYa9zE81JGatzBgl0jY1JafcJAwv6BOj3iKBlTO72vlQkp20b8Iw9GL=w640-h360-n-k-no",
    "name": "Whispering Pines Campground",
-   "seen": "2026-11-27"
+   "seen": "2026-11-28"
   }
  }
 }
